@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "product_id": "vulcan-omnipro-220",
+  "scope": "front-panel",
+  "primary_evidence_ref": "owner-manual-page-8",
+  "parts": [
+    {
+      "id": "front-home-button",
+      "manual_name": "Home Button",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "momentary-push-button",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_home_button"
+      ]
+    },
+    {
+      "id": "front-back-button",
+      "manual_name": "Back Button",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "momentary-push-button",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_back_button"
+      ]
+    },
+    {
+      "id": "front-control-knob",
+      "manual_name": "Control Knob",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "rotary-encoder-with-push",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_control_knob"
+      ]
+    },
+    {
+      "id": "front-left-knob",
+      "manual_name": "Left Knob",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "rotary-control",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_left_knob"
+      ]
+    },
+    {
+      "id": "front-lcd-display",
+      "manual_name": "LCD Display",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "visual-display",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_lcd_display"
+      ]
+    },
+    {
+      "id": "front-right-knob",
+      "manual_name": "Right Knob",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "rotary-control",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_right_knob"
+      ]
+    },
+    {
+      "id": "front-power-switch",
+      "manual_name": "Power Switch",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "owner-manual-page-16",
+        "product-front-photo"
+      ],
+      "interaction_type": "rocker-switch",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_power_switch"
+      ]
+    },
+    {
+      "id": "front-storage-compartment",
+      "manual_name": "Storage Compartment",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "access-compartment",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_storage_compartment"
+      ]
+    },
+    {
+      "id": "front-mig-spool-gun-cable-socket",
+      "manual_name": "MIG Gun / Spool Gun Cable Socket",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "cable-socket",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_mig_spool_gun_cable_socket"
+      ]
+    },
+    {
+      "id": "front-positive-socket",
+      "manual_name": "Positive Socket",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "owner-manual-page-14",
+        "product-front-photo"
+      ],
+      "interaction_type": "twist-lock-power-socket",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_positive_socket"
+      ]
+    },
+    {
+      "id": "front-spool-gun-gas-outlet",
+      "manual_name": "Spool Gun Gas Outlet",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "product-front-photo"
+      ],
+      "interaction_type": "gas-hose-outlet",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_spool_gun_gas_outlet"
+      ]
+    },
+    {
+      "id": "front-negative-socket",
+      "manual_name": "Negative Socket",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "owner-manual-page-14",
+        "product-front-photo"
+      ],
+      "interaction_type": "twist-lock-power-socket",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_negative_socket"
+      ]
+    },
+    {
+      "id": "front-wire-feed-power-cable",
+      "manual_name": "Wire Feed Power Cable",
+      "evidence_refs": [
+        "owner-manual-page-8",
+        "owner-manual-page-14",
+        "product-front-photo"
+      ],
+      "interaction_type": "fixed-power-cable",
+      "confidence": "high",
+      "expected_mesh_names": [
+        "front_panel_wire_feed_power_cable"
+      ]
+    }
+  ]
+}

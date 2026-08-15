@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "product_id": "vulcan-omnipro-220",
+  "sources": [
+    {
+      "id": "product-front-photo",
+      "type": "product-image",
+      "path": "product.webp",
+      "media_type": "image/webp",
+      "sha256": "c80366105834175156dfbc5d425fba6e4f3cc448910f958a03c372f74485d752",
+      "dimensions_px": {
+        "width": 1200,
+        "height": 1200
+      },
+      "supports": [
+        "front-panel appearance",
+        "front-panel component placement",
+        "front-panel colors and proportions"
+      ]
+    },
+    {
+      "id": "owner-manual-page-8",
+      "type": "manual-page",
+      "path": "files/owner-manual.pdf",
+      "media_type": "application/pdf",
+      "sha256": "52aa60b4e51e9671b85c1077c23c42fc5db852ec9626e1a3bf55f0d664964789",
+      "page": 8,
+      "printed_page": 8,
+      "supports": [
+        "authoritative front-panel component names",
+        "front-panel component layout",
+        "spool-gun gas connection note"
+      ]
+    },
+    {
+      "id": "owner-manual-page-14",
+      "type": "manual-page",
+      "path": "files/owner-manual.pdf",
+      "media_type": "application/pdf",
+      "sha256": "52aa60b4e51e9671b85c1077c23c42fc5db852ec9626e1a3bf55f0d664964789",
+      "page": 14,
+      "printed_page": 14,
+      "supports": [
+        "Negative Socket connection",
+        "Positive Socket connection",
+        "Wire Feed Power Cable connection"
+      ]
+    },
+    {
+      "id": "owner-manual-page-16",
+      "type": "manual-page",
+      "path": "files/owner-manual.pdf",
+      "media_type": "application/pdf",
+      "sha256": "52aa60b4e51e9671b85c1077c23c42fc5db852ec9626e1a3bf55f0d664964789",
+      "page": 16,
+      "printed_page": 16,
+      "supports": [
+        "Power Switch location and operation"
+      ]
+    }
+  ]
+}
