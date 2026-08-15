@@ -1,17 +1,25 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import frontPartsManifest from '../assets/omnipro/semantics/front-parts.json';
+import { createOmniProFront } from './model/createOmniProFront.js';
 import './style.css';
 
 const sceneElement = document.querySelector('#scene');
 const resetButton = document.querySelector('#reset-view');
-const wireframeInput = document.querySelector('#wireframe');
+const frontViewButton = document.querySelector('#front-view');
+const referenceInput = document.querySelector('#reference');
+const referenceView = document.querySelector('.reference-view');
+const partNameElement = document.querySelector('#part-name');
+const partSourceElement = document.querySelector('#part-source');
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color('#d7d5ce');
 scene.fog = new THREE.Fog('#d7d5ce', 50, 105);
 
 const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 200);
-const initialCameraPosition = new THREE.Vector3(31, 24, 36);
+const initialCameraPosition = window.matchMedia('(max-width: 680px)').matches
+  ? new THREE.Vector3(0, 16, 62)
+  : new THREE.Vector3(-39, 28, 48);
 camera.position.copy(initialCameraPosition);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -28,101 +36,26 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.07;
 controls.minDistance = 25;
 controls.maxDistance = 75;
+controls.minAzimuthAngle = -Math.PI * 0.42;
+controls.maxAzimuthAngle = Math.PI * 0.42;
 controls.maxPolarAngle = Math.PI * 0.49;
 controls.target.set(0, 8, 0);
 
-const colors = {
-  orange: '#e85b18',
-  orangeDark: '#a83810',
-  graphite: '#1c2022',
-  black: '#080a0b',
-  steel: '#a7adb0',
-  screen: '#7dc7d8',
-};
+const welder = createOmniProFront();
+const interactiveParts = [];
 
-const modelMaterials = [];
-
-function material(color, roughness = 0.7, metalness = 0.05) {
-  const nextMaterial = new THREE.MeshStandardMaterial({ color, roughness, metalness });
-  modelMaterials.push(nextMaterial);
-  return nextMaterial;
-}
-
-function box(name, size, position, meshMaterial, parent, rotation = [0, 0, 0]) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), meshMaterial);
-  mesh.name = name;
-  mesh.position.set(...position);
-  mesh.rotation.set(...rotation);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  parent.add(mesh);
-  return mesh;
-}
-
-function cylinder(name, radius, depth, position, meshMaterial, parent, rotation = [Math.PI / 2, 0, 0]) {
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, depth, 24), meshMaterial);
-  mesh.name = name;
-  mesh.position.set(...position);
-  mesh.rotation.set(...rotation);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  parent.add(mesh);
-  return mesh;
-}
-
-function createWelder() {
-  const welder = new THREE.Group();
-  welder.name = 'OmniPro 220 abstract model';
-
-  const orange = material(colors.orange, 0.55, 0.12);
-  const orangeDark = material(colors.orangeDark, 0.65, 0.08);
-  const graphite = material(colors.graphite, 0.72, 0.16);
-  const black = material(colors.black, 0.68, 0.15);
-  const steel = material(colors.steel, 0.3, 0.72);
-  const screen = material(colors.screen, 0.18, 0.1);
-
-  // Overall reference envelope: 12 W × 17 H × 21 L inches.
-  box('Main enclosure', [12, 12.25, 20.25], [0, 7, 0], orange, welder);
-  box('Lower rail', [11.5, 1.15, 20.65], [0, 1.3, 0], graphite, welder);
-  box('Front control panel', [10.7, 10.75, 0.65], [0, 7.25, 10.25], graphite, welder);
-  box('Front upper inset', [9.3, 4.7, 0.22], [0, 9.6, 10.62], black, welder);
-  box('LCD', [5.1, 2.65, 0.18], [0, 10.05, 10.78], screen, welder);
-
-  cylinder('Main dial', 0.78, 0.45, [0, 7.15, 10.85], steel, welder);
-  cylinder('Left dial', 0.45, 0.42, [-3.2, 7.15, 10.83], black, welder);
-  cylinder('Right dial', 0.45, 0.42, [3.2, 7.15, 10.83], black, welder);
-
-  cylinder('Negative port', 0.62, 0.5, [-2.9, 4.15, 10.86], black, welder);
-  cylinder('Positive port', 0.62, 0.5, [0, 4.15, 10.86], orangeDark, welder);
-  cylinder('Torch port', 0.72, 0.55, [3.1, 4.15, 10.88], steel, welder);
-
-  box('Handle left mount', [1.05, 3.35, 2.2], [-4.4, 14.25, -2.5], graphite, welder);
-  box('Handle right mount', [1.05, 3.35, 2.2], [4.4, 14.25, -2.5], graphite, welder);
-  box('Carry handle', [9.85, 1.25, 2.25], [0, 16.35, -2.5], graphite, welder);
-
-  for (const x of [-4.7, 4.7]) {
-    for (const z of [-7.6, 7.4]) {
-      box('Rubber foot', [1.25, 0.75, 1.5], [x, 0.38, z], black, welder);
-    }
+for (const part of frontPartsManifest.parts) {
+  for (const meshName of part.expected_mesh_names) {
+    const object = welder.getObjectByName(meshName);
+    if (!object) continue;
+    object.userData.partId = part.id;
+    object.userData.manualName = part.manual_name;
+    object.userData.evidenceRefs = part.evidence_refs;
+    object.userData.confidence = part.confidence;
+    interactiveParts.push(object);
   }
-
-  // Side-door seam and vents establish the product silhouette without claiming exact placement.
-  box('Side door inset', [0.22, 9.8, 14.8], [-6.11, 7.15, -0.1], orangeDark, welder);
-  for (let index = 0; index < 6; index += 1) {
-    box(
-      'Side vent',
-      [0.24, 0.42, 5.4],
-      [-6.25, 4.7 + index * 0.75, -2.1],
-      black,
-      welder,
-      [0, 0, -0.06],
-    );
-  }
-
-  return welder;
 }
 
-const welder = createWelder();
 scene.add(welder);
 
 const floorMaterial = new THREE.MeshStandardMaterial({ color: '#c7c4bc', roughness: 1 });
@@ -153,6 +86,87 @@ const rimLight = new THREE.DirectionalLight('#9bc8d8', 1.8);
 rimLight.position.set(-22, 14, -18);
 scene.add(rimLight);
 
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let pointerStart = null;
+let selectedPartHelper = null;
+
+function evidenceLabel(part) {
+  const labels = [];
+  if (part.evidence_refs.includes('owner-manual-page-8')) labels.push('Owner’s Manual p. 8');
+  if (part.evidence_refs.includes('product-front-photo')) labels.push('official product photo');
+  return `${labels.join(' · ')} · ${part.confidence} confidence`;
+}
+
+function selectPart(part) {
+  const meshName = part?.expected_mesh_names[0];
+  const object = meshName ? welder.getObjectByName(meshName) : null;
+
+  if (selectedPartHelper) {
+    scene.remove(selectedPartHelper);
+    selectedPartHelper.geometry.dispose();
+    selectedPartHelper.material.dispose();
+    selectedPartHelper = null;
+  }
+
+  if (!part || !object) {
+    partNameElement.textContent = 'Select a control';
+    partSourceElement.textContent = 'Owner’s Manual page 8';
+    renderer.render(scene, camera);
+    return;
+  }
+
+  selectedPartHelper = new THREE.Box3Helper(new THREE.Box3().setFromObject(object), '#e85b18');
+  selectedPartHelper.name = `Selection: ${part.manual_name}`;
+  scene.add(selectedPartHelper);
+  partNameElement.textContent = part.manual_name;
+  partSourceElement.textContent = evidenceLabel(part);
+  renderer.render(scene, camera);
+}
+
+function partFromObject(object) {
+  let current = object;
+  while (current && current !== welder) {
+    if (current.userData.partId) {
+      return frontPartsManifest.parts.find((part) => part.id === current.userData.partId) ?? null;
+    }
+    current = current.parent;
+  }
+  return null;
+}
+
+renderer.domElement.addEventListener('pointerdown', (event) => {
+  pointerStart = { x: event.clientX, y: event.clientY };
+});
+
+renderer.domElement.addEventListener('pointerup', (event) => {
+  if (!pointerStart || Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 5) {
+    pointerStart = null;
+    return;
+  }
+
+  pointerStart = null;
+  const bounds = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+  pointer.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hit = raycaster.intersectObjects(interactiveParts, true)[0];
+  selectPart(hit ? partFromObject(hit.object) : null);
+});
+
+const resolvedPartIds = frontPartsManifest.parts
+  .filter((part) => part.expected_mesh_names.every((meshName) => welder.getObjectByName(meshName)))
+  .map((part) => part.id);
+
+window.__OMNIPRO_MODEL_AUDIT__ = Object.freeze({
+  expectedPartCount: frontPartsManifest.parts.length,
+  resolvedPartCount: resolvedPartIds.length,
+  resolvedPartIds: Object.freeze(resolvedPartIds),
+  selectPart: (partId) => selectPart(
+    frontPartsManifest.parts.find((part) => part.id === partId) ?? null,
+  ),
+});
+
 function resize() {
   const { clientWidth, clientHeight } = sceneElement;
   camera.aspect = clientWidth / clientHeight;
@@ -168,11 +182,15 @@ resetButton.addEventListener('click', () => {
   renderer.render(scene, camera);
 });
 
-wireframeInput.addEventListener('change', () => {
-  for (const meshMaterial of modelMaterials) {
-    meshMaterial.wireframe = wireframeInput.checked;
-  }
+frontViewButton.addEventListener('click', () => {
+  camera.position.set(0, 8.2, 43);
+  controls.target.set(0, 8, 0);
+  controls.update();
   renderer.render(scene, camera);
+});
+
+referenceInput.addEventListener('change', () => {
+  referenceView.hidden = !referenceInput.checked;
 });
 
 controls.addEventListener('change', () => renderer.render(scene, camera));

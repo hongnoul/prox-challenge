@@ -5,19 +5,19 @@ import * as THREE from 'three';
  * OmniPro 220 owner manual. Consumers can use these with getObjectByName().
  */
 export const OMNIPRO_FRONT_PART_NAMES = Object.freeze({
-  homeButton: 'Home button',
-  backButton: 'Back button',
-  lcd: 'LCD display',
-  leftKnob: 'Left knob',
-  mainKnob: 'Main control knob',
-  rightKnob: 'Right knob',
-  powerSwitch: 'Power switch',
-  migSpoolGunSocket: 'MIG / Spool Gun cable socket',
-  spoolGunGasOutlet: 'Spool Gun gas outlet',
-  negativeSocket: 'Negative socket',
-  positiveSocket: 'Positive socket',
-  wireFeedPowerCable: 'Wire-feed power cable',
-  storageCompartment: 'Storage compartment',
+  homeButton: 'front_panel_home_button',
+  backButton: 'front_panel_back_button',
+  lcd: 'front_panel_lcd_display',
+  leftKnob: 'front_panel_left_knob',
+  mainKnob: 'front_panel_control_knob',
+  rightKnob: 'front_panel_right_knob',
+  powerSwitch: 'front_panel_power_switch',
+  migSpoolGunSocket: 'front_panel_mig_spool_gun_cable_socket',
+  spoolGunGasOutlet: 'front_panel_spool_gun_gas_outlet',
+  negativeSocket: 'front_panel_negative_socket',
+  positiveSocket: 'front_panel_positive_socket',
+  wireFeedPowerCable: 'front_panel_wire_feed_power_cable',
+  storageCompartment: 'front_panel_storage_compartment',
 });
 
 const DEFAULT_PALETTE = Object.freeze({
@@ -98,9 +98,9 @@ function scallopedGeometry(radius, depth, scallops = 10, recess = 0.12) {
 
 function triangleGeometry(width, height) {
   const shape = new THREE.Shape();
-  shape.moveTo(0, -height / 2);
-  shape.lineTo(-width / 2, height / 2);
-  shape.lineTo(width / 2, height / 2);
+  shape.moveTo(0, height / 2);
+  shape.lineTo(-width / 2, -height / 2);
+  shape.lineTo(width / 2, -height / 2);
   shape.closePath();
   return new THREE.ShapeGeometry(shape);
 }

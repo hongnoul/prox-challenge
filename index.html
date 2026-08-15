@@ -15,8 +15,8 @@
 
       <header class="title-block">
         <p class="kicker">Vulcan OmniPro 220</p>
-        <h1>Form study</h1>
-        <p class="note">Scale anchored. Details estimated from reference photos.</p>
+        <h1>Front panel</h1>
+        <p class="note">Instructional front panel traced to Owner’s Manual page 8.</p>
       </header>
 
       <section class="specs" aria-label="Model dimensions">
@@ -26,14 +26,26 @@
       </section>
 
       <div class="controls" aria-label="Viewer controls">
+        <button id="front-view" type="button">Front view</button>
         <button id="reset-view" type="button">Reset view</button>
         <label>
-          <input id="wireframe" type="checkbox" />
-          <span>Wireframe</span>
+          <input id="reference" type="checkbox" />
+          <span>Reference</span>
         </label>
       </div>
 
-      <p class="orbit-hint">Drag to orbit · Scroll to zoom</p>
+      <aside class="part-inspector" aria-live="polite">
+        <span class="part-inspector__status">Source-backed component</span>
+        <strong id="part-name">Select a control</strong>
+        <span id="part-source">Owner’s Manual page 8</span>
+      </aside>
+
+      <figure class="reference-view" hidden>
+        <img src="/product.webp" alt="Official OmniPro 220 exterior reference" />
+        <figcaption>Official exterior reference</figcaption>
+      </figure>
+
+      <p class="orbit-hint">Drag to orbit · Select a control</p>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>
