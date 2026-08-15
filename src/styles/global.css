@@ -1,0 +1,167 @@
+:root {
+  color-scheme: light;
+  --paper: #f3f3f0;
+  --ink: #171918;
+  --muted: #747875;
+  --line: #d9dad5;
+  --steel: #e7e8e3;
+  --signal: #df4b27;
+  --signal-dark: #bd371a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--paper);
+  font-family:
+    Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--ink);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.onboarding-shell {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+.intent-picker {
+  width: min(100%, 68rem);
+  text-align: center;
+}
+
+.machine-label {
+  margin: 0 0 1.4rem;
+  color: var(--signal);
+  font-family: "Arial Narrow", "Helvetica Neue", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.intent-picker h1 {
+  max-width: 18ch;
+  margin: 0 auto;
+  font-size: clamp(2.25rem, 6vw, 5.5rem);
+  font-weight: 450;
+  letter-spacing: -0.055em;
+  line-height: 0.96;
+  text-wrap: balance;
+}
+
+.intent-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: clamp(2.4rem, 6vw, 4.25rem);
+}
+
+.intent-leading {
+  margin-right: 0.2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.intent-pill {
+  appearance: none;
+  min-height: 3.15rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--steel);
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0.82rem 1.35rem;
+  font-size: 1rem;
+  font-weight: 560;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 120ms ease;
+}
+
+.intent-pill:hover {
+  border-color: #c7c9c2;
+  background: #dedfd9;
+}
+
+.intent-pill:active {
+  transform: scale(0.98);
+}
+
+.intent-pill[data-selected] {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: white;
+}
+
+.intent-pill[data-selected]:hover {
+  border-color: var(--signal-dark);
+  background: var(--signal-dark);
+}
+
+.intent-pill:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--signal) 35%, transparent);
+  outline-offset: 3px;
+}
+
+.intent-pill span {
+  display: inline-block;
+}
+
+.intent-response {
+  min-height: 1.5em;
+  max-width: 34rem;
+  margin: 1.65rem auto 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+@media (max-width: 640px) {
+  .intent-picker h1 {
+    max-width: 12ch;
+  }
+
+  .intent-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .intent-leading {
+    margin: 0 0 0.2rem;
+  }
+
+  .intent-pill {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,18 +1,30 @@
 {
-  "name": "omnipro-model-viewer",
+  "name": "omnipro-support",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "check:model": "node scripts/check-front-model.mjs"
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check:model": "node scripts/check-front-model.mjs",
+    "check": "astro check",
+    "dev:model": "vite",
+    "build:model": "vite build"
   },
   "dependencies": {
+    "@astrojs/react": "^6.0.2",
+    "astro": "^7.2.2",
+    "gsap": "^3.15.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "three": "^0.179.1"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^6.0.3",
     "vite": "^7.1.2"
   }
 }
