@@ -1,6 +1,6 @@
 # Prox Engineering Challenge
 
-<img src="product.webp" alt="Vulcan OmniPro 220" width="400" /> <img src="product-inside.webp" alt="Vulcan OmniPro 220 — inside panel" width="400" />
+<img src="files/product.webp" alt="Vulcan OmniPro 220" width="400" /> <img src="files/product-inside.webp" alt="Vulcan OmniPro 220 — inside panel" width="400" />
 
 ## Solution Design
 
