@@ -2,6 +2,16 @@
 
 <img src="product.webp" alt="Vulcan OmniPro 220" width="400" /> <img src="product-inside.webp" alt="Vulcan OmniPro 220 — inside panel" width="400" />
 
+## Solution Design
+
+> **Status:** Design only. This branch retains the original challenge scaffold plus planning documents. The install and run commands later in this README are challenge placeholders until the production application is implemented.
+
+The proposed implementation is documented separately from the original challenge brief:
+
+- [Product vision](VISION.md)
+- [Technical architecture](ARCHITECTURE.md)
+- [ADR 0001: Use Next.js for the production application](docs/adr/0001-use-nextjs.md)
+
 ## The Product
 
 The [Vulcan OmniPro 220](https://www.harborfreight.com/omnipro-220-industrial-multiprocess-welder-with-120240v-input-57812.html) is a multiprocess welding system sold by Harbor Freight. It supports four welding processes (MIG, Flux-Cored, TIG, and Stick), runs on both 120V and 240V input, and has an LCD-based synergic control system.
