@@ -8,6 +8,7 @@ import {
 } from "../lib/omnipro/create-omnipro-front";
 
 const rootDirectory = process.cwd();
+const requiredSchemaVersion = 2;
 const confidenceValues = new Set([
   "measured",
   "corroborated",
@@ -121,6 +122,13 @@ async function main(): Promise<void> {
 const evidence = await parseJson("assets/omnipro/evidence/sources.json");
 const manifest = await parseJson("assets/omnipro/semantics/parts.json");
 
+if (number(evidence.schema_version, "evidence.schema_version") !== requiredSchemaVersion) {
+  fail(`Evidence schema_version must be ${requiredSchemaVersion}`);
+}
+if (number(manifest.schema_version, "manifest.schema_version") !== requiredSchemaVersion) {
+  fail(`Semantic manifest schema_version must be ${requiredSchemaVersion}`);
+}
+
 const evidencePolicy = record(evidence.evidence_policy, "evidence_policy");
 const officialProductUrl = string(
   evidencePolicy.official_product_url,
@@ -153,12 +161,13 @@ for (const [index, sourceValue] of sources.entries()) {
     const relativePath = string(source.path, `${id}.path`);
     const absolutePath = resolveEvidencePath(relativePath);
     await access(absolutePath);
-    if (source.sha256 !== undefined) {
-      const expectedHash = string(source.sha256, `${id}.sha256`);
-      const actualHash = await sha256(absolutePath);
-      if (actualHash !== expectedHash) {
-        fail(`${id} hash mismatch: expected ${expectedHash}, received ${actualHash}`);
-      }
+    const expectedHash = string(source.sha256, `${id}.sha256`);
+    if (!/^[a-f0-9]{64}$/i.test(expectedHash)) {
+      fail(`${id}.sha256 must be a 64-character hexadecimal SHA-256 digest`);
+    }
+    const actualHash = await sha256(absolutePath);
+    if (actualHash !== expectedHash.toLowerCase()) {
+      fail(`${id} hash mismatch: expected ${expectedHash}, received ${actualHash}`);
     }
   }
 

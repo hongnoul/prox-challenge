@@ -30,7 +30,7 @@ export default function HomePage() {
         <footer className="product-twin-footnote">
           <span>13 documented front-panel parts</span>
           <span>Manual pages 8, 14, and 16</span>
-          <span>Geometry and dimensions remain inferred</span>
+          <span>Manufacturing dimensions remain unresolved</span>
         </footer>
       </section>
     </main>

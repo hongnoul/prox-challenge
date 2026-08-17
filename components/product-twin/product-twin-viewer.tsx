@@ -115,6 +115,7 @@ export function ProductTwinViewer() {
     host.append(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
+    renderer.domElement.style.touchAction = "pan-y";
     controls.enableDamping = !reducedMotionQuery.matches;
     controls.dampingFactor = 0.07;
     controls.minDistance = 25;
