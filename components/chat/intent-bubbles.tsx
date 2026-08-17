@@ -76,7 +76,16 @@ export function IntentBubbles() {
       });
     });
 
-    return () => context.revert();
+    // Keep the intent controls usable if a background tab or automation host
+    // throttles the animation frame loop after GSAP applies its start state.
+    const revealFallback = window.setTimeout(() => {
+      gsap.set([...pills, ...labels], { autoAlpha: 1, scale: 1, y: 0 });
+    }, 1_000);
+
+    return () => {
+      window.clearTimeout(revealFallback);
+      context.revert();
+    };
   }, []);
 
   useEffect(() => {
@@ -114,7 +123,6 @@ export function IntentBubbles() {
               aria-pressed={isSelected}
               data-selected={isSelected || undefined}
               onClick={() => setSelectedIntent(intent.id)}
-              style={{ opacity: 0 }}
             >
               <span
                 ref={(element) => {

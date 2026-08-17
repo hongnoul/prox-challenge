@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "product_id": "vulcan-omnipro-220",
+  "evidence_policy": {
+    "claim": "Source-faithful instructional reconstruction, not an exact digital twin.",
+    "official_product_url": "https://www.harborfreight.com/omnipro-220-industrial-multiprocess-welder-with-120240v-input-57812.html",
+    "accessed_on": "2026-08-17",
+    "limitations": [
+      "The supplied sources establish visible front-panel identity and relative placement, but not manufacturing dimensions, tolerances, materials, or internal geometry.",
+      "The local product image was supplied with the challenge. Its byte-for-byte provenance from the official product page was not independently verified.",
+      "The reconstruction must not be used for fabrication, repair clearances, electrical decisions, or safety-critical measurements."
+    ]
+  },
+  "sources": [
+    {
+      "id": "official-product-page",
+      "type": "web-page",
+      "source_url": "https://www.harborfreight.com/omnipro-220-industrial-multiprocess-welder-with-120240v-input-57812.html",
+      "page_title": "VULCAN OmniPro 220 Industrial Multiprocess Welder with 120/240V Input",
+      "publisher": "Harbor Freight Tools",
+      "accessed_on": "2026-08-17",
+      "supports": [
+        "product identity",
+        "published nominal overall dimensions of 12 W x 17 H x 21 D inches"
+      ],
+      "limitations": [
+        "No local page snapshot or content hash is committed, so future listing changes cannot be reconstructed from this repository alone.",
+        "Published overall dimensions do not define which guards, feet, handles, or cable protrusions are included.",
+        "Listing dimensions are nominal product metadata, not manufacturing tolerances."
+      ]
+    },
+    {
+      "id": "product-front-photo",
+      "type": "product-image",
+      "path": "files/product.webp",
+      "source_url": "https://www.harborfreight.com/omnipro-220-industrial-multiprocess-welder-with-120240v-input-57812.html",
+      "accessed_on": "2026-08-17",
+      "media_type": "image/webp",
+      "sha256": "c80366105834175156dfbc5d425fba6e4f3cc448910f958a03c372f74485d752",
+      "dimensions_px": {
+        "width": 1200,
+        "height": 1200
+      },
+      "supports": [
+        "front-panel appearance",
+        "front-panel component placement",
+        "front-panel colors and relative proportions"
+      ],
+      "limitations": [
+        "Single perspective view introduces occlusion and perspective distortion.",
+        "Color varies with lighting, capture, display, and compression.",
+        "No scale reference supports exact dimensions.",
+        "The official URL identifies the product context, not verified provenance of this local file."
+      ]
+    },
+    {
+      "id": "owner-manual-page-8",
+      "type": "manual-page",
+      "path": "files/owner-manual.pdf",
+      "media_type": "application/pdf",
+      "sha256": "52aa60b4e51e9671b85c1077c23c42fc5db852ec9626e1a3bf55f0d664964789",
+      "page": 8,
+      "printed_page": 8,
+      "supports": [
+        "authoritative front-panel component names",
+        "front-panel component layout",
+        "spool-gun gas connection note"
+      ],
+      "limitations": [
+        "The line drawing is schematic and does not provide manufacturing dimensions.",
+        "Hidden surfaces and internal mechanisms are not documented by this page."
+      ]
+    },
+    {
+      "id": "owner-manual-page-14",
+      "type": "manual-page",
+      "path": "files/owner-manual.pdf",
+      "media_type": "application/pdf",
+      "sha256": "52aa60b4e51e9671b85c1077c23c42fc5db852ec9626e1a3bf55f0d664964789",
+      "page": 14,
+      "printed_page": 14,
+      "supports": [
+        "Negative Socket connection",
+        "Positive Socket connection",
+        "Wire Feed Power Cable connection"
+      ],
+      "limitations": [
+        "Connection guidance supports identity and function, not connector manufacturing geometry."
+      ]
+    },
+    {
+      "id": "owner-manual-page-16",
+      "type": "manual-page",
+      "path": "files/owner-manual.pdf",
+      "media_type": "application/pdf",
+      "sha256": "52aa60b4e51e9671b85c1077c23c42fc5db852ec9626e1a3bf55f0d664964789",
+      "page": 16,
+      "printed_page": 16,
+      "supports": [
+        "Power Switch location and operation"
+      ],
+      "limitations": [
+        "Operational guidance does not establish switch dimensions or internal electrical construction."
+      ]
+    }
+  ]
+}

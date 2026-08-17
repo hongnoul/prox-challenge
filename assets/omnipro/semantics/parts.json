@@ -1,0 +1,178 @@
+{
+  "schema_version": 2,
+  "product_id": "vulcan-omnipro-220",
+  "scope": "front-panel-and-visible-exterior",
+  "primary_evidence_ref": "owner-manual-page-8",
+  "fidelity_classification": "source-faithful instructional reconstruction",
+  "model_bounds": {
+    "units": "procedural-model-units",
+    "expected_min": [-6.1083, -0.04, -10.225],
+    "expected_max": [6.1083, 16.79, 12.5687],
+    "regression_tolerance": 0.05,
+    "nominal_product_envelope_inches": [12, 17, 21],
+    "evidence_ref": "official-product-page",
+    "limitations": [
+      "The expected Box3 values are a geometry regression baseline, not product measurements.",
+      "The computed depth includes modeled front guards and cable protrusions and therefore exceeds the listing's ambiguous nominal depth.",
+      "The regression tolerance catches unintended code drift; it is not a manufacturing tolerance."
+    ]
+  },
+  "parts": [
+    {
+      "id": "front-home-button",
+      "manual_name": "Home Button",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "momentary-push-button",
+      "expected_object_names": ["front_panel_home_button"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["cap dimensions", "projection depth", "actuation travel", "marking typography"]
+    },
+    {
+      "id": "front-back-button",
+      "manual_name": "Back Button",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "momentary-push-button",
+      "expected_object_names": ["front_panel_back_button"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["cap dimensions", "projection depth", "actuation travel", "marking typography"]
+    },
+    {
+      "id": "front-control-knob",
+      "manual_name": "Control Knob",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "rotary-encoder-with-push",
+      "expected_object_names": ["front_panel_control_knob"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["diameter", "projection depth", "detent count", "rotation limits", "push travel"]
+    },
+    {
+      "id": "front-left-knob",
+      "manual_name": "Left Knob",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "rotary-control",
+      "expected_object_names": ["front_panel_left_knob"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["diameter", "projection depth", "detent count", "rotation limits"]
+    },
+    {
+      "id": "front-lcd-display",
+      "manual_name": "LCD Display",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "visual-display",
+      "expected_object_names": ["front_panel_lcd_display"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["active display dimensions", "bezel depth", "pixel resolution", "screen content and state"]
+    },
+    {
+      "id": "front-right-knob",
+      "manual_name": "Right Knob",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "rotary-control",
+      "expected_object_names": ["front_panel_right_knob"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["diameter", "projection depth", "detent count", "rotation limits"]
+    },
+    {
+      "id": "front-power-switch",
+      "manual_name": "Power Switch",
+      "evidence_refs": ["owner-manual-page-8", "owner-manual-page-16", "product-front-photo"],
+      "interaction_type": "rocker-switch",
+      "expected_object_names": ["front_panel_power_switch"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "corroborated",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["cutout dimensions", "rocker travel", "internal electrical construction", "marking dimensions"]
+    },
+    {
+      "id": "front-storage-compartment",
+      "manual_name": "Storage Compartment",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "access-compartment",
+      "expected_object_names": ["front_panel_storage_compartment"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["internal depth", "wall thickness", "louver spacing", "load capacity"]
+    },
+    {
+      "id": "front-mig-spool-gun-cable-socket",
+      "manual_name": "MIG Gun / Spool Gun Cable Socket",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "cable-socket",
+      "expected_object_names": ["front_panel_mig_spool_gun_cable_socket"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["connector standard", "pin dimensions", "keying geometry", "recess depth"]
+    },
+    {
+      "id": "front-positive-socket",
+      "manual_name": "Positive Socket",
+      "evidence_refs": ["owner-manual-page-8", "owner-manual-page-14", "product-front-photo"],
+      "interaction_type": "twist-lock-power-socket",
+      "expected_object_names": ["front_panel_positive_socket"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "corroborated",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["DINSE size", "bore dimensions", "key geometry", "mounting depth"]
+    },
+    {
+      "id": "front-spool-gun-gas-outlet",
+      "manual_name": "Spool Gun Gas Outlet",
+      "evidence_refs": ["owner-manual-page-8", "product-front-photo"],
+      "interaction_type": "gas-hose-outlet",
+      "expected_object_names": ["front_panel_spool_gun_gas_outlet"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "observed",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["quick-connect standard", "thread geometry", "bore dimensions", "projection depth"]
+    },
+    {
+      "id": "front-negative-socket",
+      "manual_name": "Negative Socket",
+      "evidence_refs": ["owner-manual-page-8", "owner-manual-page-14", "product-front-photo"],
+      "interaction_type": "twist-lock-power-socket",
+      "expected_object_names": ["front_panel_negative_socket"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "corroborated",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["DINSE size", "bore dimensions", "key geometry", "mounting depth"]
+    },
+    {
+      "id": "front-wire-feed-power-cable",
+      "manual_name": "Wire Feed Power Cable",
+      "evidence_refs": ["owner-manual-page-8", "owner-manual-page-14", "product-front-photo"],
+      "interaction_type": "fixed-power-cable",
+      "expected_object_names": ["front_panel_wire_feed_power_cable"],
+      "identity_confidence": "corroborated",
+      "placement_confidence": "corroborated",
+      "geometry_confidence": "inferred",
+      "appearance_confidence": "observed",
+      "unresolved": ["cable gauge", "length", "bend radius", "gland dimensions", "terminal construction"]
+    }
+  ]
+}

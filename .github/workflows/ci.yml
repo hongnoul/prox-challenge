@@ -30,5 +30,8 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Validate product model
+        run: npm run check:model
+
       - name: Build
         run: npm run build
