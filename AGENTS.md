@@ -17,6 +17,6 @@ These instructions apply whenever work touches a product model, product viewer, 
 
 ## Current OmniPro terminology
 
-The current front-panel milestone should be described as a **source-faithful instructional reconstruction**. Its component identity and approximate front layout are supported by the owner's manual and product photography. Most component depths, diameters, radii, spacing, and construction tolerances remain inferred.
+The current OmniPro milestone should be described as a **source-faithful instructional reconstruction**. Its current modeled scope is the front panel. Component identity and approximate front layout are supported by the owner's manual and product photography. Most component depths, diameters, radii, and spacing remain inferred. Construction tolerances are unresolved and have not been established.
 
 If `VISION.md` exists, use it for product direction and acceptance goals. Use the reconstruction runbook for the evidence-to-model procedure. If they conflict, stop and surface the conflict rather than silently weakening the fidelity standard.

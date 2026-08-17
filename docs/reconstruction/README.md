@@ -26,7 +26,7 @@ Use the narrowest accurate description.
 
 ### Source-faithful instructional reconstruction
 
-Use this when component identity and visual placement are supported by manuals and photographs, but some physical dimensions are inferred. This is the correct description for the current OmniPro front-panel prototype.
+Use this when component identity and visual placement are supported by manuals and photographs, but some physical dimensions are inferred. The current OmniPro prototype is classified as a **source-faithful instructional reconstruction**. Its current modeled scope is the front panel.
 
 ### Dimensionally anchored reconstruction
 
@@ -112,7 +112,7 @@ Do not place durable procedure in a generic `research/` directory. Research is i
 
 ## Data contracts
 
-The schemas below are the target contract for new work. The session-local OmniPro prototype used an earlier, narrower schema. Do not treat that legacy shape as compliant merely because it can be parsed.
+The schemas below are the target contract for new work. The published OmniPro prototype on the `prototype/threejs-front` branch at commit `c635bbd` used an earlier, narrower schema. Do not treat that legacy shape as compliant merely because it can be parsed.
 
 ### `sources.json`
 
@@ -173,7 +173,7 @@ Record the camera and landmarks used to compare the model with a source image.
   "views": [
     {
       "id": "front-reference",
-      "source_id": "front-orthographic-photo",
+      "source_id": "product-front-photo",
       "projection": "unresolved",
       "focal_length_equivalent_mm": null,
       "calibration": "unresolved",
@@ -426,9 +426,9 @@ Future integration work should correct these rather than copying them forward:
 - The visual comparison was reviewed manually in the browser. No repeatable camera-calibrated overlay or image-difference gate exists yet.
 - No independent holdout view was available for the front milestone.
 
-### Integration targets
+### Published prototype context
 
-The prototype commits were session-local and are not reachable from a fresh clone of the public repository. Preserve or recreate these artifacts during integration rather than relying on commit hashes in this document:
+The prototype artifacts originated in commit `c635bbd` on the `prototype/threejs-front` branch. They remain available from that branch until integration. Before retiring the branch, integration must preserve the useful artifacts and their source lineage. This case study records their evidence, implementation, and limitations as context; it does not make the prototype's earlier contracts the current runbook contract. Use these artifacts as integration references and migrate them rather than copying them forward unchanged:
 
 ```text
 assets/omnipro/evidence/sources.json
@@ -439,14 +439,14 @@ scripts/check-front-model.mjs
 
 The legacy `front-parts.json` used a single confidence field. It must be migrated to the multidimensional confidence contract above before being treated as compliant with this runbook.
 
-### Session-local prototype observations
+### Published prototype observations
 
 The following were observed during the original development session, but the screenshots and browser report were not committed as release evidence. Rerun and save them after the model is integrated:
 
 - All 13 front components had stable semantic objects.
 - Manual names and product-photo evidence were attached to selectable parts.
 - The model included the front silhouette, guard structure, display, controls, sockets, storage opening, and cable.
-- A session-local headless browser run exercised desktop and mobile rendering plus selection, front-view, reset, and reference controls.
+- An uncommitted headless browser run exercised desktop and mobile rendering plus selection, front-view, reset, and reference controls.
 
 ### What it did not establish
 
@@ -460,7 +460,7 @@ The following were observed during the original development session, but the scr
 - A calibrated camera match
 - Engineering fit or service-clearance accuracy
 
-The correct claim is therefore **source-faithful instructional front reconstruction**, not exact replica.
+The correct classification is therefore **source-faithful instructional reconstruction**, not exact replica. The prototype's modeled scope is the front panel.
 
 ## Required future evidence
 
