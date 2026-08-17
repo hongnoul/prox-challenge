@@ -4,13 +4,15 @@
 
 ## Solution Design
 
-> **Status:** Design only. This branch retains the original challenge scaffold plus planning documents. The install and run commands later in this README are challenge placeholders until the production application is implemented.
+> **Status:** Design only. The runtime is not implemented yet. See the [implementation plan](docs/plans/implementation-plan.md) for current status and delivery work.
 
-The proposed implementation is documented separately from the original challenge brief:
+Documentation is separated by lifecycle:
 
-- [Product vision](VISION.md)
-- [Technical architecture](ARCHITECTURE.md)
-- [ADR 0001: Use Next.js for the production application](docs/adr/0001-use-nextjs.md)
+- [Product Vision](VISION.md): durable product constitution
+- [Architecture Constitution](ARCHITECTURE.md): durable system boundaries, contracts, and invariants
+- [Challenge Requirements and Evaluator Scope](docs/challenge/requirements.md): time-bound delivery and submission context
+- [ADR 0001: Use Next.js for the production application](docs/adr/0001-use-nextjs.md): framework decision and rationale
+- [Implementation Plan](docs/plans/implementation-plan.md): prototype lineage, migration, milestones, and unresolved work
 
 ## The Product
 

@@ -1,36 +1,27 @@
 # Architecture: OmniPro Product Twin
 
-**Status:** Draft
-**Date:** 2026-08-15
-**Related:** [Product Vision](VISION.md), [ADR 0001](docs/adr/0001-use-nextjs.md)
+**Role:** Architecture constitution
+**Status:** Durable architectural intent
+**Related:** [Product Vision](VISION.md), [Challenge requirements](docs/challenge/requirements.md), [Implementation plan](docs/plans/implementation-plan.md), [ADR 0001](docs/adr/0001-use-nextjs.md)
 
-## Purpose
+## Constitutional role
 
-This document defines the clean application architecture for the OmniPro Product Twin described in `VISION.md`.
+This document defines the system's enduring architectural principles, ownership boundaries, canonical domain model, cross-boundary contracts, and security, performance, and testing invariants. It is the architecture constitution: framework adapters, repository paths, delivery sequencing, prototypes, and deployment targets may change while these boundaries remain authoritative.
 
-The architecture begins from the original challenge scaffold rather than inheriting the Astro and standalone Vite prototype as an application foundation. That prototype is preserved separately on branch `prototype/threejs-front` at commit `c635bbd` and is not part of this documentation branch. Its Three.js model, semantic part manifest, evidence manifest, and model validation gate are candidate porting inputs.
+A change to a constitutional invariant requires explicit architectural review. A contextual technology choice belongs in an ADR. Current implementation state and executable work belong in the [implementation plan](docs/plans/implementation-plan.md). Time-bound evaluator constraints belong in [challenge requirements](docs/challenge/requirements.md).
 
-## Challenge constraints
+## System purpose
 
-The implementation must:
+The system compiles product source material into a validated product package and serves that package through an evidence-grounded, multimodal product-support experience.
 
-- Use the Anthropic Claude Agent SDK as the agent foundation
-- Run locally with one `ANTHROPIC_API_KEY`
-- Be usable within two minutes of cloning
-- Provide a clean frontend
-- Answer deep technical questions that cross-reference text and visual evidence
-- Produce multimodal responses, including diagrams and interactive artifacts
-- Handle ambiguous questions through clarification
-- Explain knowledge extraction and representation clearly
-
-These constraints favor a precompiled local product package, one application package and development command, a Node-based server runtime, and no mandatory external services. The browser and Node remain separate runtimes.
+The architecture keeps build-time interpretation separate from runtime interaction. Both sides share versioned contracts and one canonical product model.
 
 ## Architecture summary
 
 ```mermaid
 flowchart LR
     subgraph Build[Build-time product compiler]
-        Sources[PDFs, images, reviewed 3D assets]
+        Sources[Source documents and reviewed assets]
         Extract[Deterministic extraction]
         Analyze[Semantic analysis]
         Review[Validation and review]
@@ -38,13 +29,13 @@ flowchart LR
         Sources --> Extract --> Analyze --> Review --> Compile
     end
 
-    Package[Versioned OmniPro product package]
+    Package[Versioned product package]
     Compile --> Package
 
     subgraph Runtime[Runtime application]
-        UI[Next.js product workspace]
-        API[Route handlers and event stream]
-        Agent[Claude Agent SDK runtime]
+        UI[Application UI]
+        API[Typed transport boundary]
+        Agent[Bounded agent runtime]
         Store[Product store]
         Scene[Deterministic scene runtime]
         Artifacts[Artifact runtime]
@@ -63,25 +54,25 @@ flowchart LR
     Package --> Artifacts
 ```
 
-The product compiler and runtime application are separate systems joined by a versioned product-package contract. Ingestion is not performed when an evaluator starts the application.
+The compiler and runtime are separate systems joined by a versioned product-package contract. Source ingestion never occurs in an interactive request path.
 
 ## Architectural principles
 
 ### One canonical product package
 
-The product package is the stable interface between source ingestion, runtime retrieval, agent tools, and visual interaction. The frontend and agent must not maintain separate product facts.
+The product package is the stable interface between source ingestion, runtime retrieval, agent tools, and visual interaction. The UI and agent never maintain separate product facts.
 
 ### Build-time intelligence, runtime speed
 
-Expensive extraction, OCR, semantic annotation, and validation run ahead of time. Runtime operations use compiled facts, procedures, indexes, and assets.
+Expensive extraction, OCR, semantic annotation, and validation run ahead of time. Runtime operations consume compiled facts, procedures, indexes, and assets.
 
 ### Server boundary for secrets and authority
 
-The browser never receives the Anthropic API key, direct database access, or unrestricted filesystem access. The browser communicates with typed runtime endpoints.
+The browser never receives model-provider credentials, direct database access, unrestricted filesystem access, or privileged tool authority. It communicates through typed runtime endpoints.
 
 ### Declarative scene control
 
-The agent emits high-level commands such as `focus-part` and `animate-connection`. It does not generate or execute arbitrary Three.js code.
+The agent emits high-level commands such as `focus-part` and `animate-connection`. It does not generate or execute arbitrary scene code.
 
 ### Evidence for every authoritative claim
 
@@ -91,135 +82,116 @@ Numerical, procedural, configuration, and safety-sensitive facts link to a docum
 
 Full-text and embedding indexes are materialized views. They can be rebuilt without changing canonical evidence or verified knowledge.
 
-## Runtime partitions
+### Explicit authority transitions
 
-### Next.js frontend
+Model output can propose annotations, state changes, and actions. Only reviewed build-time workflows or deterministic runtime reducers can promote those proposals into authoritative knowledge or confirmed state.
 
-The frontend is a full-stack Next.js App Router application. Most of the product workspace is interactive and belongs behind a deliberate client boundary.
+## Stable ownership and boundary model
 
-Responsibilities:
+The repository may organize files differently over time. These ownership boundaries must remain visible in module interfaces and dependency direction:
 
-- Render onboarding and the Explore, Guide, and Diagnose modes
-- Host the Three.js product twin
-- Maintain current browser-side twin and procedure state
-- Send text, image, selected-part, and configuration context to the agent endpoint
-- Consume streamed typed events
-- Execute verified scene commands
-- Render citations, source regions, calculators, flowcharts, and checklists
-- Provide accessible alternatives for 3D and motion-heavy interactions
+| Boundary | Owns | May depend on | Must not own |
+| --- | --- | --- | --- |
+| Application UI | Interaction modes, presentation state, accessibility, event consumption | Shared contracts, public product assets, typed runtime API | Secrets, canonical knowledge mutation, unrestricted tools |
+| Runtime API | Authentication of requests, validation, streaming, cancellation, backpressure | Agent orchestration, product store, shared schemas | Product reasoning, scene rendering, source ingestion |
+| Agent orchestration | Bounded reasoning turns, tool policy, evidence synthesis, typed output events | Product tools and shared contracts | Canonical data, direct scene mutation, arbitrary system tools |
+| Product store | Canonical runtime queries, evidence resolution, constraints, retrieval indexes | Versioned product package | UI state, agent transcripts, source interpretation |
+| Scene runtime | Semantic scene bindings, deterministic camera and part actions | Shared contracts and verified scene assets | Product facts, free-form model code |
+| Artifact runtime | Allowlisted interactive components and deterministic calculations | Validated props and shared contracts | Privileged application access, canonical knowledge writes |
+| Product compiler | Extraction, analysis, review inputs, package publication | Immutable sources and authoring corrections | Interactive request handling |
+| Shared contracts | Versioned schemas, identifiers, events, commands | No runtime implementation | Framework-specific behavior |
 
-The interactive workspace is a client component. Static shell content and initial product metadata may remain server rendered.
+Dependencies point inward toward contracts and canonical data, never from canonical data toward a UI or framework adapter.
+
+## Runtime responsibilities
+
+### Application UI
+
+The UI:
+
+- Renders onboarding and the Explore, Guide, and Diagnose modes.
+- Hosts the spatial product twin.
+- Maintains browser-side view state and a revisioned projection of twin state.
+- Sends user input, selected-part context, and declared configuration through the typed API.
+- Consumes streamed typed events.
+- Executes verified scene commands.
+- Renders citations, source regions, calculators, flowcharts, and checklists.
+- Provides accessible alternatives for spatial and motion-heavy interactions.
+
+High-frequency local interactions do not cross the agent boundary.
 
 ### Runtime API
 
-Next.js Route Handlers provide the transport boundary.
+The API is a thin transport and trust boundary. It:
 
-Initial endpoints:
+- Validates request and response envelopes.
+- Creates and cancels bounded work.
+- Streams typed events with backpressure.
+- Maps public identifiers to server-side product operations.
+- Enforces size, type, timeout, and concurrency limits.
+- Keeps orchestration and product access in non-transport modules.
 
-```text
-POST /api/agent
-POST /api/sessions
-GET  /api/products/[productId]
-GET  /api/entities/[entityId]
-GET  /api/evidence/[evidenceId]
-POST /api/uploads
-```
+The transport technology and endpoint layout are adapters. Current choices are recorded in the [implementation plan](docs/plans/implementation-plan.md) and relevant ADRs.
 
-The first vertical slice implements only `/api/agent`, product metadata, and evidence retrieval. Sessions, entity endpoints, and uploads are added when a tested user journey requires them. The list above is a target surface, not a requirement to build unused endpoints.
-
-`POST /api/agent` uses the Node.js runtime and returns a streamed `text/event-stream` response. Route handlers remain thin. Agent orchestration and product access live in server-only modules. The framework choice remains provisional until a runtime spike validates SDK process behavior, streaming, cancellation, concurrency, restart behavior, and production packaging.
-
-### Claude Agent SDK runtime
-
-The initial runtime uses bounded request-scoped agent turns. Application-owned session data contains the user-visible conversation summary, selected product context, and versioned twin state. It does not depend on a child process remaining alive between HTTP requests. SDK-native resume may be added only after its transcript storage and sticky-host requirements are measured and documented.
+### Agent runtime
 
 The agent runtime:
 
-- Creates bounded product-support turns and associates them with application sessions
-- Receives user input and current twin context
-- Determines whether clarification is required
-- Calls product tools through validated schemas
-- Selects verified procedures and troubleshooting paths
-- Produces concise explanations with evidence
-- Emits typed scene, artifact, citation, procedure, and state events
-- Refuses to present unsupported values as verified facts
-- Aborts work when the client disconnects or the turn times out
-- Enforces a global concurrency limit and bounded `maxTurns`
+- Creates bounded product-support turns associated with application sessions.
+- Receives user input and current twin context.
+- Determines whether clarification is required.
+- Calls product tools through validated schemas.
+- Selects verified procedures and troubleshooting paths.
+- Produces concise explanations with evidence.
+- Emits typed scene, artifact, citation, procedure, and state events.
+- Refuses to present unsupported values as verified facts.
+- Aborts work when the client disconnects or the turn times out.
+- Enforces explicit turn, output, time, and concurrency limits.
 
-The agent is not the database and is not the scene renderer.
+The agent is neither the database nor the scene renderer. It has only product-specific tools. General shell, file-writing, network, and privileged system capabilities are denied unless a separately reviewed use case requires them.
 
-Each turn runs with:
-
-- A fresh isolated working directory
-- `settingSources: []`
-- An explicit environment-variable allowlist
-- Product-specific MCP tools only
-- Bash, Edit, Write, general filesystem Read, web access, and every unneeded tool denied
-- A final `canUseTool` guard in addition to the SDK allowlist
-- A wall-clock timeout, abort signal, maximum turn count, and output-size limits
-
-Manual text, retrieved content, and user uploads are untrusted input. They cannot change the system policy, enable tools, or provide executable instructions to the SDK runtime.
-
-The runtime spike must test one normal turn, disconnect cancellation, two parallel isolated sessions, concurrency saturation, and restart behavior before the ADR can move from Proposed to Accepted.
+Manual text, retrieved content, and user uploads are untrusted input. They cannot change system policy, enable tools, or grant authority.
 
 ### Product store
 
-The product store provides one server-side interface over canonical product data and retrieval indexes.
+The product store provides one server-side interface over canonical product data and regenerable retrieval indexes. It:
 
-Responsibilities:
+- Resolves entities, aliases, facts, relationships, and constraints.
+- Retrieves procedures and troubleshooting paths.
+- Searches positioned text and structured knowledge.
+- Resolves exact source regions and authority metadata.
+- Returns verified scene bindings.
+- Validates requested actions against the product package.
 
-- Resolve entities, aliases, facts, relationships, and constraints
-- Retrieve procedures and troubleshooting paths
-- Search positioned text and structured knowledge
-- Resolve exact source regions and authority metadata
-- Return scene bindings
-- Validate that requested actions are supported by the current product package
-
-For this challenge, use a read-only SQLite database for structured metadata and FTS5 search. Keep source PDFs and server-only compilation assets outside the browser bundle. Copy browser-visible figures, source crops, and scene assets into a versioned path under `public/products/omnipro-220/`. A graph database is unnecessary for this corpus. Graph relationships can be represented by an indexed `relationships` table.
-
-Optional embeddings may improve paraphrase retrieval, but the embedding index must remain optional, local or precomputed, versioned, and regenerable.
+The storage engine is replaceable. Canonical schemas and package semantics do not depend on a particular database or search implementation.
 
 ### Scene runtime
 
-The scene runtime owns deterministic Three.js behavior.
+The scene runtime owns deterministic spatial behavior. It:
 
-Responsibilities:
-
-- Load or construct the verified OmniPro model
-- Resolve semantic part identifiers to scene nodes
-- Apply camera, highlight, visibility, connection, and animation commands
-- Report scene events using semantic identifiers
-- Maintain accessible selection and reduced-motion behavior
-- Reject commands that do not exist in the product's verified capabilities
-
-If retained, the procedural Three.js model from `prototype/threejs-front` should be migrated into this partition without changing its visible behavior until validation parity is established.
+- Loads or constructs a verified product representation.
+- Resolves semantic part identifiers to scene nodes.
+- Applies camera, highlight, visibility, connection, and animation commands.
+- Reports scene events using semantic identifiers.
+- Maintains accessible selection and reduced-motion behavior.
+- Rejects commands absent from verified product capabilities.
 
 ### Artifact runtime
 
-The artifact runtime renders typed, allowlisted components:
+The artifact runtime renders typed, allowlisted components such as calculators, configurators, checklists, flowcharts, source comparisons, and control simulations.
 
-- Duty-cycle calculator
-- Settings configurator
-- Procedure checklist
-- Troubleshooting flowchart
-- Source comparison
-- Control-panel simulator
+The agent selects an artifact type and supplies schema-validated props. Critical artifacts use deterministic calculations. Arbitrary generated content, if supported, runs in an isolated sandbox without privileged application access.
 
-The agent selects an artifact type and supplies schema-validated props. Critical artifacts use deterministic calculations. If arbitrary generated HTML is later supported, it must run in a sandboxed iframe with no privileged application access.
+## Build-time responsibilities
 
-## Build-time partitions
+### Deterministic source extractor
 
-### Deterministic document extractor
+For every source document, the extractor records:
 
-The extractor handles the three supplied PDFs and provided product images.
-
-For every document it records:
-
-- Original bytes and SHA-256 hash
+- Original bytes and cryptographic hash
 - Page count, dimensions, rotation, and metadata
 - Positioned native text spans
-- Embedded images
-- Vector drawing operators when useful
+- Embedded images and useful vector data
 - Deterministic page renders
 - Candidate table, figure, warning, and diagram regions
 - Extraction method and parser version
@@ -228,7 +200,7 @@ Native text is preferred over OCR. OCR is used only where text is absent or unus
 
 ### Semantic analyzer
 
-Claude analyzes bounded page regions with nearby text and a constrained output schema. It proposes:
+The analyzer processes bounded source regions with nearby context and a constrained output schema. It may propose:
 
 - Entities and aliases
 - Facts and conditions
@@ -239,34 +211,29 @@ Claude analyzes bounded page regions with nearby text and a constrained output s
 - Figure annotations
 - Candidate source regions
 
-The analyzer does not recreate source geometry from prose.
+The analyzer does not recreate source geometry from prose and cannot mark its own proposal as verified.
 
 ### Validator and authoring layer
 
-Validation combines deterministic checks and human review.
-
-Mandatory review subjects:
+Validation combines deterministic checks and human review. Mandatory review subjects include:
 
 - Electrical polarity and cable connections
-- Published duty-cycle values
-- Machine operating limits
+- Published operating values and limits
 - Gas and consumable requirements
 - Procedure ordering
 - Part-to-scene bindings
 - Safety warnings and prerequisites
 - Claims derived only from visual inference
 
-The authoring layer stores approved corrections separately from regenerated extraction output so rerunning ingestion does not erase reviewed work.
+Approved corrections remain separate from regenerated extraction output so repeated compilation does not erase reviewed work.
 
 ### Product-package compiler
 
-The compiler merges source evidence, extracted material, reviewed semantic knowledge, scene assets, and indexes into a versioned runtime package.
-
-The package is committed or distributed with the challenge submission. Evaluators do not run the compiler.
+The compiler merges source evidence, extracted material, reviewed semantic knowledge, scene assets, and retrieval indexes into a versioned runtime package. The same inputs and tool versions produce verifiable output hashes.
 
 ## Canonical domain model
 
-The canonical contracts are executable, versioned Zod schemas that also emit JSON Schema for build-time validation. The following TypeScript forms are explanatory, not substitutes for runtime schemas. Identifiers are branded by kind, predicates and units use finite enums, and arbitrary `unknown` values are not accepted at trust boundaries.
+Canonical contracts are executable, versioned schemas. The following TypeScript forms explain the required semantics but do not replace runtime validation. Identifiers are branded by kind, predicates and units use finite enums, and trust boundaries reject arbitrary unknown values.
 
 ### Provenance
 
@@ -278,8 +245,8 @@ type SourceEvidence = {
   id: EvidenceId;
   documentId: DocumentId;
   documentSha256: Sha256;
-  pdfPageIndex: number;       // zero-based parser index
-  printedPageLabel?: string;  // label visible in the document
+  pdfPageIndex: number;
+  printedPageLabel?: string;
   bboxPdfPoints?: [number, number, number, number];
   pageRotation: 0 | 90 | 180 | 270;
   coordinateSystem: "pdf-points-bottom-left";
@@ -325,8 +292,8 @@ type Fact = {
   id: FactId;
   subjectId: EntityId;
   predicate: FactPredicate;
-  value: TypedFactValue;      // finite scalar, enum, text, or quantity with unit
-  conditions: Condition[];    // finite fields and operators
+  value: TypedFactValue;
+  conditions: Condition[];
   evidenceRefs: EvidenceId[];
   verification: "verified" | "candidate";
 };
@@ -414,48 +381,26 @@ type TwinPatch = {
 };
 ```
 
-The agent may propose a `TwinPatch`, but only a deterministic reducer may validate preconditions, require confirmation, apply operations, and increment the revision. A simulated, recommended, or vision-observed value must never be presented as confirmed physical machine state.
+The agent may propose a `TwinPatch`, but only a deterministic reducer validates preconditions, requires confirmation, applies operations, and increments the revision. A simulated, recommended, or observed value is never presented as confirmed physical state.
 
-## Product package layout
+## Product-package contract
 
-```text
-products/omnipro-220/
-├── product-src/
-│   ├── manifest.json
-│   ├── authoring/
-│   │   ├── entity-corrections.json
-│   │   ├── procedure-approvals.json
-│   │   └── scene-binding-approvals.json
-│   └── scene/
-│       ├── create-omnipro-model.ts
-│       ├── bindings.json
-│       ├── cameras.json
-│       └── animations.json
-├── product-dist/
-│   └── v1/
-│       ├── package-manifest.json
-│       ├── knowledge.sqlite
-│       ├── documents.json
-│       ├── procedures.json
-│       ├── constraints.json
-│       ├── scene-manifest.json
-│       ├── pages/
-│       └── figures/
-└── tests/
-    └── acceptance-cases.json
-```
+The package exposes logical contents rather than a required directory tree:
 
-Original challenge sources remain under `files/` and are referenced by `product-src/manifest.json`. Generated assets do not overwrite source documents.
+| Logical area | Required contents | Authority |
+| --- | --- | --- |
+| Package manifest | Schema version, package version, source hashes, output hashes, compiler versions | Canonical package identity |
+| Source registry | Document metadata, positioned evidence, exact source assets | Immutable source authority |
+| Knowledge model | Verified entities, facts, relationships, constraints, and aliases | Canonical runtime knowledge |
+| Procedures | Ordered steps, prerequisites, transitions, warnings, evidence | Canonical guided behavior |
+| Scene manifest | Semantic bindings, supported commands, cameras, animations | Verified spatial capability |
+| Retrieval views | Full-text and optional semantic indexes | Regenerable materialized views |
+| Public assets | Browser-safe source regions, figures, and scene assets | Published projections of package outputs |
+| Acceptance cases | Product-specific contract and golden cases | Validation inputs |
 
-`product-src` contains reviewed authoring inputs and product-specific scene source. `product-dist/v1` is immutable runtime data produced by the compiler. `package-manifest.json` records schema version, package version, source hashes, output hashes, compiler versions, and the one canonical scene-binding manifest.
-
-For the challenge, the runtime scene implementation is the ported procedural TypeScript model. Next.js bundles that code with the client workspace. `product-dist` contains only data and browser assets, not executable `model.ts` files. A later GLB migration requires a new package version and validation parity rather than an `or` branch in the runtime format.
-
-Browser-visible copies of figures, page crops, and scene assets are published to `public/products/omnipro-220/v1/` from the same output manifest. Server-only SQLite and source material are never placed under `public/`.
+Authoring inputs and generated runtime outputs remain distinct. Generated assets never overwrite original source documents. Server-only source material and data never become public merely because a browser projection exists.
 
 ## Scene-command contract
-
-Initial scene commands:
 
 ```ts
 type SceneCommand =
@@ -468,13 +413,11 @@ type SceneCommand =
   | { type: "reset-scene" };
 ```
 
-Every entity in a command must resolve through a verified scene binding. The scene runtime ignores unknown commands and reports a typed error rather than guessing.
+Every entity in a command resolves through a verified scene binding. The scene runtime ignores unknown commands and reports a typed error rather than guessing.
 
-## Agent event stream
+## Agent event contract
 
-The runtime sends typed events so one turn can coordinate multiple modalities. `POST /api/agent` returns SSE framing consumed through `fetch()` and a readable response body.
-
-Every event uses this envelope:
+The runtime sends typed events so one turn can coordinate multiple modalities.
 
 ```ts
 type AgentEvent<TType extends AgentEventType, TPayload> = {
@@ -488,33 +431,15 @@ type AgentEvent<TType extends AgentEventType, TPayload> = {
 };
 ```
 
-```text
-assistant.text.delta
-assistant.clarification
-agent.tool.started
-agent.tool.completed
-citation.show
-scene.command
-artifact.open
-procedure.started
-procedure.step
-procedure.completed
-twin.patch.proposed
-twin.patch.applied
-warning.show
-assistant.completed
-assistant.error
-```
+The event vocabulary includes text deltas, clarification requests, tool lifecycle events, citations, scene commands, artifact requests, procedure progress, proposed and applied state patches, warnings, and one terminal completion or error.
 
-Sequence numbers are strictly increasing within a turn. A turn emits exactly one terminal `assistant.completed` or `assistant.error` event. Heartbeats are sent during long tool execution. Client disconnect propagates through an `AbortController` to the SDK process and tools. The handler observes stream backpressure instead of buffering unbounded output.
+Sequence numbers strictly increase within a turn. Client disconnect propagates cancellation to agent and tool work. The transport observes backpressure rather than buffering unbounded output. The client validates every envelope, ignores duplicate sequence numbers, rejects invalid payloads, and terminates cleanly after a malformed or missing terminal event.
 
-Responses set `Content-Type: text/event-stream`, `Cache-Control: no-cache, no-transform`, and proxy-buffering prevention headers where supported. The client validates every envelope, ignores duplicate sequence numbers, rejects invalid payloads, and terminates the turn cleanly after a malformed or missing terminal event.
+All non-text payloads validate against shared executable schemas before reaching the browser. A proposed twin patch cannot mutate state. Only the deterministic reducer can report an applied patch after revision checks, constraint validation, and required user confirmation.
 
-All non-text payloads are validated against shared executable schemas before reaching the browser. A `twin.patch.proposed` event cannot mutate state. Only the deterministic reducer can emit `twin.patch.applied` after revision checks, constraint validation, and any required user confirmation.
+## Agent tool contract
 
-## Agent tools
-
-Initial tools:
+The agent receives narrow product capabilities:
 
 ```text
 search_knowledge(query, filters)
@@ -529,7 +454,7 @@ emit_scene_commands(commands)
 open_artifact(type, props)
 ```
 
-Tool results contain concise evidence and identifiers, not the entire manual or raw database rows.
+Tool results contain concise evidence and identifiers, not an entire manual or raw database rows.
 
 ## Runtime flows
 
@@ -538,8 +463,8 @@ Tool results contain concise evidence and identifiers, not the entire manual or 
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant S as Three.js scene
-    participant C as Client store
+    participant S as Spatial scene
+    participant C as Client state
     participant P as Product API
 
     U->>S: Select component
@@ -549,7 +474,7 @@ sequenceDiagram
     C-->>U: Immediate part inspector
 ```
 
-The user can then ask a question. That agent request includes the selected entity and twin state.
+The user can then ask a question with the selected entity and twin state included as context.
 
 ### Grounded agent response
 
@@ -557,8 +482,8 @@ The user can then ask a question. That agent request includes the selected entit
 sequenceDiagram
     participant U as User
     participant W as Workspace
-    participant A as Agent route
-    participant T as Agent tools
+    participant A as Agent boundary
+    participant T as Product tools
     participant P as Product store
 
     U->>W: Ask a technical question
@@ -576,272 +501,98 @@ sequenceDiagram
 1. The agent selects a verified procedure.
 2. The constraint engine checks prerequisites against twin state.
 3. The UI starts the procedure and displays the first evidence-backed step.
-4. The scene runtime executes the step's declared scene command.
+4. The scene runtime executes the step's declared command.
 5. The user confirms completion or reports a mismatch.
 6. The state patch is validated before advancing.
-7. Voice, text, 3D, and source views remain synchronized to the same step identifier.
+7. Voice, text, spatial, and source views remain synchronized to the same step identifier.
 
-## Retrieval strategy
+## Retrieval invariants
 
-Use hybrid deterministic retrieval appropriate for a small local corpus:
+Retrieval follows this order of authority:
 
 1. Structured lookup for known entities, facts, procedures, and conditions
-2. SQLite FTS5 for exact terminology, model numbers, units, and source text
-3. Metadata filters for process, voltage, material, document, and source type
+2. Exact terminology and positioned source-text search
+3. Metadata filters for product context and source type
 4. Optional semantic retrieval for paraphrased questions
-5. Agent synthesis over the small returned evidence set
+5. Agent synthesis over a bounded returned evidence set
 
-Do not send all 48 pages to the model for every question. Do not rely on embeddings for exact numbers or polarity.
+Semantic similarity never substitutes for exact numbers, safety constraints, or polarity. Retrieval indexes remain optional and regenerable.
 
-## Repository layout
+## Security and safety invariants
 
-```text
-prox-challenge/
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx
-│   ├── workspace/page.tsx
-│   └── api/
-│       ├── agent/route.ts
-│       ├── sessions/route.ts
-│       ├── products/[productId]/route.ts
-│       ├── entities/[entityId]/route.ts
-│       ├── evidence/[evidenceId]/route.ts
-│       └── uploads/route.ts
-├── components/
-│   ├── product-twin/
-│   ├── chat/
-│   ├── voice/
-│   ├── procedures/
-│   ├── evidence/
-│   └── artifacts/
-├── lib/
-│   ├── client/
-│   │   ├── agent-stream.ts
-│   │   ├── twin-store.ts
-│   │   └── scene-controller.ts
-│   ├── server/
-│   │   ├── agent/
-│   │   │   ├── runtime.ts
-│   │   │   ├── system-prompt.ts
-│   │   │   ├── sessions.ts
-│   │   │   └── tools/
-│   │   └── product/
-│   │       ├── store.ts
-│   │       ├── search.ts
-│   │       ├── evidence.ts
-│   │       ├── procedures.ts
-│   │       └── constraints.ts
-│   └── shared/
-│       ├── contracts/
-│       └── schemas/
-├── products/
-│   └── omnipro-220/
-│       ├── product-src/
-│       ├── product-dist/
-│       └── tests/
-├── scripts/
-│   ├── ingest/
-│   └── validate/
-├── files/
-├── public/
-│   └── products/omnipro-220/v1/
-├── next.config.ts
-├── VISION.md
-├── ARCHITECTURE.md
-└── package.json
-```
-
-The Three.js workspace is a client component. Agent SDK and product-store modules are server-only. Ingestion remains a command-line build system rather than a web route.
-
-## Security and safety
-
-- `ANTHROPIC_API_KEY` remains server-side.
-- Agent tools are denied by default and use runtime schema validation.
-- SDK settings ignore user and project configuration through `settingSources: []`.
-- Agent turns use isolated working directories, bounded execution, explicit environment variables, and product-specific MCP tools only.
-- Bash, Edit, Write, general filesystem Read, web access, and unlisted tools remain disabled.
-- Uploaded images have bounded size and type and are deleted according to a documented retention policy.
-- Source paths are resolved through identifiers, never arbitrary user-supplied filesystem paths.
-- Generated HTML, if introduced, runs in a sandboxed iframe.
+- Provider credentials remain server-side.
+- Agent tools are denied by default and validate all input and output.
+- Agent turns use isolated, bounded execution with explicit environment access.
+- General shell, file-writing, unrestricted reading, web access, and unlisted tools remain disabled.
+- Uploaded media has bounded size and type and follows a documented retention policy.
+- Source paths resolve through identifiers, never arbitrary user-supplied filesystem paths.
+- Generated interactive content runs without privileged application access.
 - Safety-critical facts and procedure steps require verified status.
 - Generated explanations cannot update canonical knowledge at runtime.
-- Logs must not contain API keys or unnecessarily retain user images.
-- Manual text, OCR, retrieved passages, and uploads are treated as prompt-injection-capable untrusted content.
-- Disconnects and timeouts terminate SDK and tool work rather than leaving child processes running.
+- Logs never contain credentials and do not retain user media without purpose and policy.
+- Source documents, OCR, retrieved passages, and uploads are prompt-injection-capable untrusted content.
+- Disconnects and timeouts terminate agent and tool work.
 
-## Performance targets
+## Performance invariants
 
-Targets are provisional until measured. Record hardware, browser, Node version, package version, corpus version, sample count, and percentile for every published result. Local retrieval targets use the precompiled three-document corpus and at least 100 representative queries after warm-up. Scene targets use a 30-second scripted orbit and interaction run.
+- Interactive startup does not perform document ingestion.
+- The application shell becomes usable independently of heavy spatial assets.
+- Product assets and source regions load on demand.
+- Ordinary selection, camera, and inspection interactions require no model call.
+- Retrieval and rendering budgets are explicit, measured, and reproducible.
+- Agent responses expose progress promptly and stream bounded output.
+- Spatial quality degrades gracefully for constrained devices and reduced-motion preferences.
+- Published measurements identify hardware, software versions, package version, corpus version, sample count, and percentile.
 
-- Evaluator setup completes within two minutes.
-- Runtime does not perform document ingestion.
-- Application shell becomes usable before the 3D model finishes loading.
-- Product assets and source regions load lazily.
-- Ordinary part selection and camera interactions require no model call.
-- Local structured and full-text retrieval targets p95 below 150 ms on the documented evaluator-class laptop.
-- Agent responses expose progress immediately and stream text and typed events.
-- Three.js targets p95 frame rate at or above 55 FPS on the documented desktop profile, with a 30 FPS reduced-quality fallback.
-- Model size, texture resolution, shadows, and pixel ratio degrade gracefully.
+Current numeric targets belong in the [implementation plan](docs/plans/implementation-plan.md), where they can evolve with evidence.
 
-## Testing strategy
+## Testing invariants
 
 ### Product-package tests
 
 - Every source hash matches the packaged source.
 - Every verified fact and procedure step has valid evidence.
-- Every evidence region is within its source page.
+- Every evidence region lies within its source page.
 - Every verified scene binding resolves to an existing scene node.
 - Every procedure transition and constraint is schema-valid.
-- Every source reference records both zero-based PDF page index and printed page label when available.
-- The product-dist manifest, runtime database, browser assets, and all output hashes agree.
+- Source references preserve parser page index and visible page label where available.
+- The package manifest, runtime data, public assets, and output hashes agree.
 
 ### Deterministic unit tests
 
-- Duty-cycle calculations use published values correctly.
+- Published operating values are reproduced correctly.
 - Unsupported intermediate values are not labeled official.
-- MIG, flux-core, and TIG polarity constraints are correct.
-- Twin-state patches reject incompatible connections.
-- Artifact props and agent events validate against their schemas.
+- Product configuration constraints reject incompatible states.
+- Twin-state patches enforce revision, precondition, and confirmation rules.
+- Artifact props, commands, tools, and agent events validate against their schemas.
 
 ### Golden agent cases
 
-- MIG at 200 A on 240 V returns 25% and the correct ten-minute plan.
-- TIG setup uses torch-to-negative and ground-to-positive.
-- Self-shielded flux-core uses DCEN.
-- Porosity guidance respects process and shielding context.
+- Technical answers use the correct product context and evidence.
 - Ambiguous settings requests trigger clarification.
-- Every technical answer contains valid source identifiers.
-- Visual-only source questions retrieve the correct figure rather than relying on OCR text alone.
-- Malicious instructions embedded in uploads or retrieved manual text cannot enable tools or override policy.
+- Visual-only questions retrieve the relevant figure rather than relying on OCR alone.
+- Malicious instructions embedded in source or user content cannot enable tools or override policy.
 
 ### End-to-end tests
 
-- A clean clone starts with the documented commands.
-- Chat streams text, citation, and scene events.
-- Clicking a part creates the correct semantic context.
-- A guided procedure updates twin state and scene state together.
-- The evidence drawer opens the correct source region.
-- An invalid configuration is visibly rejected.
-- Reduced-motion and keyboard paths remain usable.
-- Disconnecting a streamed turn cancels SDK and tool execution.
-- Two parallel sessions cannot observe each other's state or working files.
-- Restart behavior matches the documented session contract.
-- A clean `next build` and production start include the SDK runtime, native database dependency, read-only product database, and browser-visible product assets.
+- A documented local startup path works from a clean checkout.
+- Agent output streams text and typed non-text events.
+- Part selection creates the correct semantic context.
+- Guided procedures keep twin, scene, evidence, and instruction state synchronized.
+- Invalid configurations are visibly rejected.
+- Keyboard and reduced-motion paths remain usable.
+- Disconnects cancel work, sessions remain isolated, and restart behavior matches the documented contract.
+- Production packaging includes all required runtime dependencies and product data.
 
-Run mocked-agent suites on every change. Run live-agent golden cases behind an explicit environment gate so normal tests are deterministic and do not spend API credits.
+Mocked-agent suites run deterministically. Live-agent cases require an explicit environment gate so routine validation does not spend API credits or depend on a provider.
 
-## Deployment
+## Runtime and deployment invariants
 
-Local execution is the primary requirement.
+- Interactive runtime and product compilation remain independently executable.
+- Runtime credentials, canonical data, and privileged tools stay outside the browser.
+- Production packaging includes every runtime dependency and versioned product artifact without recompiling sources.
+- Local execution remains a supported baseline even when hosted deployment exists.
+- Deployment adapters are validated for streaming, cancellation, isolation, persistence, filesystem, subprocess, and native-dependency behavior.
+- Session continuity or explicit session loss is documented and testable.
 
-The agent route must run in the Node.js runtime. The Claude Agent SDK may require filesystem, transcript, binary, or subprocess behavior that is unsuitable for some edge or serverless environments. Hosting should therefore be validated against the SDK before choosing a provider. A self-hosted Next.js Node process or container is the baseline deployment target.
-
-Use `output: "standalone"` for production packaging. `next.config.ts` must use `outputFileTracingIncludes` for server-only product files and `serverExternalPackages` for native SQLite or Agent SDK packages when their bundling requires it. The product database path is read-only and resolved from the packaged application root. Browser-visible assets are served only from the versioned `public/products/` path.
-
-The application should support:
-
-```bash
-cp .env.example .env
-npm install
-npm run dev
-```
-
-A production build should support `npm run build` and `npm start` without rerunning ingestion. Once implementation begins, pin the Node and package-manager versions and change evaluator instructions to `npm ci` with a committed lockfile.
-
-## Prototype migration plan
-
-The prototype is preserved on `prototype/threejs-front` at commit `c635bbd` and treated as an asset source, not an application constraint. That branch must be published before a fresh clone is expected to follow this lineage.
-
-Port:
-
-- The procedural OmniPro front model
-- Stable semantic mesh names
-- The front-parts semantic manifest
-- The source-evidence manifest
-- The model validation gate
-- Useful geometry and material techniques
-
-Replace or redesign:
-
-- The standalone Vite `index.html` entry point
-- The disconnected Astro onboarding entry point
-- DOM-coupled scene orchestration
-- Prototype-only styling and copy
-- Static-only runtime assumptions
-
-Migration steps:
-
-1. Establish product and event schemas in TypeScript.
-2. Port the model factory behind a deterministic scene-runtime interface.
-3. Reproduce the prototype model gate against the ported scene.
-4. Embed the model in the Next.js client workspace.
-5. Add part-selection events and local entity resolution.
-6. Add server-side product access and evidence endpoints.
-7. Add the Claude Agent SDK route and one end-to-end grounded journey.
-8. Expand ingestion, procedures, constraints, and artifacts incrementally.
-
-The prototype remains successful if its model and semantic bindings survive the port with validation parity. Its frontend structure does not need to survive.
-
-## Delivery sequence
-
-### Milestone 0: runtime feasibility
-
-- Minimal Next.js Node route invoking the pinned Claude Agent SDK
-- Production `next build` and `next start`
-- POST response streaming without buffering
-- Disconnect and timeout cancellation
-- Two-session isolation and concurrency cap
-- Restart and session-continuation contract
-- Standalone tracing for SDK, SQLite, and product files
-- ADR 0001 accepted or the Vite plus persistent Node fallback selected
-
-### Milestone 1: foundation
-
-- Clean Next.js application
-- Shared schemas
-- Ported Three.js model and validation gate
-- Semantic part selection
-- Product manifest and exact source registry
-
-### Milestone 2: grounded agent
-
-- Claude Agent SDK integration
-- Product-store tools
-- Streaming text and citations
-- Exact source-evidence drawer
-- Duty-cycle golden case
-
-### Milestone 3: executable twin
-
-- Typed scene commands
-- Twin state and constraints
-- TIG and polarity walkthroughs
-- Procedure state machine
-
-### Milestone 4: multimodal diagnosis
-
-- Troubleshooting graph
-- Porosity visual comparison
-- Image upload
-- Interactive artifacts
-- Optional voice procedure control
-
-### Milestone 5: submission quality
-
-- Full acceptance suite
-- README and architecture explanation
-- Hosted deployment if compatible
-- Video walkthrough
-- Performance and accessibility pass
-
-## Open questions
-
-- Which Claude Agent SDK deployment environments support the required runtime behavior reliably?
-- Will the final 3D representation remain procedural or migrate to a reviewed GLB asset?
-- Which ingestion stages require human review for this challenge submission?
-- Is local semantic retrieval worth its package and startup cost for a three-document corpus?
-- Which voice transcription path can preserve the single-key setup requirement?
-- How should uploaded images be retained or deleted in hosted deployments?
-
-These questions can be resolved through small implementation spikes without changing the core product-package contract.
+Technology selection and feasibility evidence are contextual decisions. See [ADR 0001](docs/adr/0001-use-nextjs.md) and the [implementation plan](docs/plans/implementation-plan.md).
