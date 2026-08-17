@@ -1,7 +1,7 @@
 # OmniPro Implementation Plan
 
 **Role:** Contextual execution plan
-**Status:** Design documented, implementation not yet started on this line of work
+**Status:** Next.js foundation implemented; product-twin integration and agent runtime in progress
 **Last reviewed:** 2026-08-17
 
 ## Purpose
@@ -12,11 +12,12 @@ It is subordinate to the [Product Vision](../../VISION.md) and [Architecture Con
 
 ## Current status
 
-- The repository contains the original challenge scaffold, source PDFs, product images, and design documentation.
-- The product runtime, ingestion compiler, and evaluator startup path are not implemented here yet.
-- The existing install and run commands in the original README remain placeholders.
-- ADR 0001 is Proposed until its runtime feasibility gate passes.
-- The target stack and file layout below are plans, not constitutional boundaries.
+- The repository contains the challenge scaffold, source PDFs, product images, lifecycle-separated design documentation, and a canonical Next.js App Router foundation.
+- The onboarding interaction, standalone production packaging, typecheck, build, and baseline CI are implemented.
+- The evidence-backed product-twin port is tracked as the next integration layer; the ingestion compiler and agent runtime remain unimplemented.
+- Repository-level `npm ci`, `npm run typecheck`, `npm run build`, and `npm start` commands now define the implemented application path.
+- ADR 0001 remains Proposed until its Agent SDK runtime feasibility gate passes.
+- The remaining target stack and file layout below are execution plans, not constitutional boundaries.
 
 Update this section whenever implementation evidence changes. Do not copy status claims into the constitutional documents.
 

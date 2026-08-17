@@ -4,7 +4,7 @@
 
 ## Solution Design
 
-> **Status:** Design only. The runtime is not implemented yet. See the [implementation plan](docs/plans/implementation-plan.md) for current status and delivery work.
+> **Status:** Implementation in progress. The canonical Next.js onboarding, standalone production build, and baseline CI are implemented. Product-twin and agent-runtime work remain tracked in the [implementation plan](docs/plans/implementation-plan.md).
 
 Documentation is separated by lifecycle:
 
