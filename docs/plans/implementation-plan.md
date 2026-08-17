@@ -1,7 +1,7 @@
 # OmniPro Implementation Plan
 
 **Role:** Contextual execution plan
-**Status:** Next.js foundation implemented; product-twin integration and agent runtime in progress
+**Status:** Next.js foundation and evidence-backed front-panel twin implemented; agent runtime and product compiler in progress
 **Last reviewed:** 2026-08-17
 
 ## Purpose
@@ -13,9 +13,9 @@ It is subordinate to the [Product Vision](../../VISION.md) and [Architecture Con
 ## Current status
 
 - The repository contains the challenge scaffold, source PDFs, product images, lifecycle-separated design documentation, and a canonical Next.js App Router foundation.
-- The onboarding interaction, standalone production packaging, typecheck, build, and baseline CI are implemented.
-- The evidence-backed product-twin port is tracked as the next integration layer; the ingestion compiler and agent runtime remain unimplemented.
-- Repository-level `npm ci`, `npm run typecheck`, `npm run build`, and `npm start` commands now define the implemented application path.
+- The onboarding interaction, evidence-backed front-panel twin, standalone production packaging, typecheck, model gate, build, and CI are implemented.
+- The product twin exposes 13 source-bound front-panel parts with explicit multidimensional confidence and unresolved geometry; the ingestion compiler and agent runtime remain unimplemented.
+- Repository-level `npm ci`, `npm run typecheck`, `npm run check:model`, `npm run build`, and `npm start` commands define the implemented application path.
 - ADR 0001 remains Proposed until its Agent SDK runtime feasibility gate passes.
 - The remaining target stack and file layout below are execution plans, not constitutional boundaries.
 
@@ -53,7 +53,7 @@ The normal Astro build and standalone viewer are disconnected. The prototype has
 
 ### Lineage handling
 
-The prototype source must be reachable from a fresh checkout before implementation relies on it. If the prototype reference is unavailable, import the relevant work through a reviewed patch and retain its provenance in the implementation history.
+The prototype source is preserved as implementation lineage through commit `c635bbd`; the integration history records that superseded line before the branch is retired. The canonical application does not depend on the old branch remaining available.
 
 The model transition is complete when semantic parts resolve, source references remain valid, reviewed appearance and envelope checks pass, bound entities can be selected and highlighted, and the primary application no longer requires a second viewer command.
 

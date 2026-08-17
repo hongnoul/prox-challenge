@@ -4,7 +4,7 @@
 
 ## Solution Design
 
-> **Status:** Implementation in progress. The canonical Next.js onboarding, standalone production build, and baseline CI are implemented. Product-twin and agent-runtime work remain tracked in the [implementation plan](docs/plans/implementation-plan.md).
+> **Status:** Implementation in progress. The canonical Next.js onboarding, evidence-backed front-panel product twin, standalone production build, model gate, and CI are implemented. Agent-runtime and product-compiler work remain tracked in the [implementation plan](docs/plans/implementation-plan.md).
 
 Documentation is separated by lifecycle:
 
