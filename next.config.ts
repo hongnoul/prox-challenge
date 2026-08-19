@@ -19,9 +19,12 @@ function agentSdkNativePackage(): string {
 }
 
 const sdkNativePackage = agentSdkNativePackage();
+const isVercelBuild = process.env.VERCEL === "1";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Vercel packages Next.js functions itself. Forcing Next's standalone
+  // server there removes files that Vercel's builder still needs.
+  ...(!isVercelBuild && { output: "standalone" as const }),
   serverExternalPackages: ["@anthropic-ai/claude-agent-sdk"],
   outputFileTracingIncludes: {
     "/api/agent": [
