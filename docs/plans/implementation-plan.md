@@ -1,8 +1,8 @@
 # OmniPro Implementation Plan
 
 **Role:** Contextual execution plan
-**Status:** Next.js foundation implemented; product-twin integration and agent runtime in progress
-**Last reviewed:** 2026-08-17
+**Status:** Challenge runtime implemented; live credential verification and secondary scope remain
+**Last reviewed:** 2026-08-19
 
 ## Purpose
 
@@ -12,12 +12,13 @@ It is subordinate to the [Product Vision](../../VISION.md) and [Architecture Con
 
 ## Current status
 
-- The repository contains the challenge scaffold, source PDFs, product images, lifecycle-separated design documentation, and a canonical Next.js App Router foundation.
-- The onboarding interaction, standalone production packaging, typecheck, build, and baseline CI are implemented.
-- The evidence-backed product-twin port is tracked as the next integration layer; the ingestion compiler and agent runtime remain unimplemented.
-- Repository-level `npm ci`, `npm run typecheck`, `npm run build`, and `npm start` commands now define the implemented application path.
-- ADR 0001 remains Proposed until its Agent SDK runtime feasibility gate passes.
-- The remaining target stack and file layout below are execution plans, not constitutional boundaries.
+- The versioned OmniPro package compiles five supplied source assets into ten exact evidence records, verified facts, executable procedures, constraints, scene bindings, and eight acceptance cases.
+- The Next.js workspace implements Explore, Guide, and Diagnose modes; a lazy procedural Three.js twin; local click-to-explain; exact source dialogs; confirmed procedures; and allowlisted duty-cycle, polarity, source-comparison, and adaptive troubleshooting artifacts.
+- The server implements sessions, deterministic product lookup, evidence and entity endpoints, ordered SSE, a bounded Claude Agent SDK adapter, in-process product MCP tools, and a transparent deterministic fallback when no key is present.
+- The standalone build traces the active platform's Claude Agent SDK binary and compiled product package. Sessions are intentionally in-memory with explicit loss on restart.
+- `npm run validate` passes the source-hash gate, 13-part model gate, TypeScript, 50 tests, and production build from a clean `npm ci` checkout.
+- Headless production verification covers startup, the 3D scene, duty-cycle evidence and artifact, TIG procedure state changes, click-to-explain, and the process-aware porosity path.
+- ADR 0001's build, packaging, cancellation, isolation, concurrency, and restart gates pass. A real-key streamed Claude turn remains the only credential-dependent feasibility check.
 
 Update this section whenever implementation evidence changes. Do not copy status claims into the constitutional documents.
 
@@ -63,12 +64,11 @@ Subject to ADR 0001's feasibility gate, the current target is:
 
 - Full-stack Next.js App Router application using TypeScript and the Node.js runtime
 - React client boundary for the continuously interactive workspace and Three.js lifecycle
-- Route Handlers for agent streaming, product data, evidence, sessions, and uploads
+- Route Handlers for agent streaming, product data, evidence, entities, health, and sessions
 - Server-only modules for the Claude Agent SDK, filesystem access, and product store
 - Bounded request-scoped agent turns with application-owned session state
-- Build-time ingestion CLI outside the web request path
-- Read-only SQLite metadata and FTS5 retrieval for the current three-document corpus
-- Optional, local or precomputed semantic retrieval as a regenerable index
+- Deterministic build-time product compiler outside the web request path
+- Validated JSON package and local structured retrieval for the current three-document corpus
 - Procedural Three.js model until a reviewed GLB replacement proves validation parity
 
 These choices implement the stable boundaries in the Architecture Constitution. They may be replaced without changing product-package, event, scene-command, tool, or evidence contracts.
@@ -86,7 +86,9 @@ ADR 0001 can move from Proposed to Accepted only after a spike with pinned runti
 
 If the gate fails, use a Vite React client plus a persistent Node agent server while preserving the constitutional contracts.
 
-## Planned runtime surface
+Current result: every gate above is automated or directly observed except a real-key Claude response. Mocked SDK streams verify adapter behavior and tool restrictions; the production standalone contains and launches the native SDK binary. Final acceptance still requires one `ANTHROPIC_API_KEY`-backed turn.
+
+## Implemented runtime surface
 
 The initial target endpoint set is:
 
@@ -96,85 +98,65 @@ POST /api/sessions
 GET  /api/products/[productId]
 GET  /api/entities/[entityId]
 GET  /api/evidence/[evidenceId]
-POST /api/uploads
+GET  /api/health
 ```
 
-The first vertical slice needs only agent streaming, product metadata, and evidence retrieval. Add the remaining endpoints when an evaluated journey requires them.
+The agent route uses validated streamed events, thin transport logic, cancellation, bounded output and cost, and a global concurrency limit. Current event and tool semantics are defined in the [Architecture Constitution](../../ARCHITECTURE.md). Uploads remain secondary scope and are not advertised by the interface.
 
-The agent route uses streamed server events, thin transport logic, cancellation, backpressure, and bounded execution. Current event and tool semantics are defined in the [Architecture Constitution](../../ARCHITECTURE.md).
+## Implemented product-package materialization
 
-## Planned product-package materialization
-
-The current file materialization is illustrative and may change while retaining the logical package contract:
+The submitted runtime uses this compact materialization:
 
 ```text
 products/omnipro-220/
 ├── product-src/
-│   ├── manifest.json
-│   ├── authoring/
-│   │   ├── entity-corrections.json
-│   │   ├── procedure-approvals.json
-│   │   └── scene-binding-approvals.json
-│   └── scene/
-│       ├── create-omnipro-model.ts
-│       ├── bindings.json
-│       ├── cameras.json
-│       └── animations.json
+│   └── product-source.ts
 ├── product-dist/
 │   └── v1/
 │       ├── package-manifest.json
-│       ├── knowledge.sqlite
-│       ├── documents.json
-│       ├── procedures.json
-│       ├── constraints.json
-│       ├── scene-manifest.json
-│       ├── pages/
-│       └── figures/
-└── tests/
-    └── acceptance-cases.json
+│       └── package.json
+└── public assets are published under
+    public/products/omnipro-220/v1/{pages,figures}/
 ```
 
 Original challenge sources remain under `files/`. Generated browser-safe figures, source crops, and scene assets are published from the package manifest to a versioned public path. Server-only databases and source material never go under the public asset root.
 
-## Planned repository materialization
+## Implemented repository materialization
 
-This tree preserves the earlier file-by-file proposal as execution context. It is not the stable ownership model and should change when implementation evidence favors a better organization.
+The implementation now follows the intended ownership boundaries:
 
 ```text
 prox-challenge/
 ├── app/
 │   ├── layout.tsx
 │   ├── page.tsx
-│   ├── workspace/page.tsx
 │   └── api/
 │       ├── agent/route.ts
 │       ├── sessions/route.ts
 │       ├── products/[productId]/route.ts
 │       ├── entities/[entityId]/route.ts
 │       ├── evidence/[evidenceId]/route.ts
-│       └── uploads/route.ts
+│       └── health/route.ts
 ├── components/
 │   ├── product-twin/
 │   ├── chat/
-│   ├── voice/
-│   ├── procedures/
+│   ├── workspace/
 │   ├── evidence/
 │   └── artifacts/
 ├── lib/
 │   ├── client/
 │   │   ├── agent-stream.ts
-│   │   ├── twin-store.ts
-│   │   └── scene-controller.ts
+│   │   └── api.ts
 │   ├── server/
 │   │   ├── agent/
 │   │   └── product/
 │   └── shared/
 │       ├── contracts/
-│       └── schemas/
+│       └── domain/
 ├── products/omnipro-220/
 ├── scripts/
-│   ├── ingest/
-│   └── validate/
+│   ├── compile-product.ts
+│   └── check-omnipro-model.ts
 ├── files/
 ├── public/products/omnipro-220/v1/
 ├── VISION.md
@@ -186,18 +168,18 @@ The intended dependency rule is more important than these paths: the workspace i
 
 ## Migration sequence
 
-1. Establish product, evidence, event, command, and state schemas in TypeScript.
-2. Move the procedural model behind a deterministic scene-runtime interface.
-3. Reproduce the prototype model gate against the new scene boundary.
-4. Embed the model in the primary client workspace.
-5. Add semantic part-selection events and local entity resolution.
-6. Add server-side product access and evidence endpoints.
-7. Add the Claude Agent SDK route and one end-to-end grounded journey.
-8. Expand ingestion, procedures, constraints, and artifacts incrementally.
+1. [x] Establish product, evidence, event, command, and state schemas in TypeScript.
+2. [x] Move the procedural model behind a deterministic scene-runtime interface.
+3. [x] Reproduce the prototype model gate against the new scene boundary.
+4. [x] Embed the model in the primary client workspace.
+5. [x] Add semantic part-selection events and local entity resolution.
+6. [x] Add server-side product access and evidence endpoints.
+7. [x] Add the Claude Agent SDK route and end-to-end grounded journeys.
+8. [x] Add deterministic product compilation, procedures, constraints, and artifacts for the evaluated scope.
 
 ## Delivery milestones
 
-### Milestone 0: runtime feasibility
+### Milestone 0: runtime feasibility — complete except real-key turn
 
 - Minimal Node route invoking the pinned Claude Agent SDK
 - Production build and start
@@ -208,7 +190,7 @@ The intended dependency rule is more important than these paths: the workspace i
 - Standalone tracing for SDK, SQLite, and product files
 - ADR 0001 accepted or fallback selected
 
-### Milestone 1: foundation
+### Milestone 1: foundation — complete
 
 - Primary application shell
 - Shared schemas
@@ -216,7 +198,7 @@ The intended dependency rule is more important than these paths: the workspace i
 - Semantic part selection
 - Product manifest and exact source registry
 
-### Milestone 2: grounded agent
+### Milestone 2: grounded agent — complete
 
 - Claude Agent SDK integration
 - Product-store tools
@@ -224,22 +206,22 @@ The intended dependency rule is more important than these paths: the workspace i
 - Exact source-evidence drawer
 - Duty-cycle golden case
 
-### Milestone 3: executable twin
+### Milestone 3: executable twin — complete
 
 - Typed scene commands
 - Twin state and constraints
 - TIG and polarity walkthroughs
 - Procedure state machine
 
-### Milestone 4: multimodal diagnosis
+### Milestone 4: multimodal diagnosis — challenge scope complete
 
 - Troubleshooting graph
 - Porosity visual comparison
-- Image upload
 - Interactive artifacts
-- Optional voice procedure control
 
-### Milestone 5: submission quality
+Image upload and voice control remain strong secondary scope.
+
+### Milestone 5: submission quality — partially complete
 
 - Full challenge acceptance suite
 - Startup and implementation documentation
@@ -264,20 +246,20 @@ The target local development path is:
 
 ```bash
 cp .env.example .env
-npm install
+# Add ANTHROPIC_API_KEY
+npm ci
 npm run dev
 ```
 
-Production should support `npm run build` and `npm start` without rerunning ingestion. Once implementation begins, pin runtime and package-manager versions, commit the lockfile, and use deterministic installation instructions.
+Production supports `npm run build` and `npm start` without rerunning compilation. Runtime dependencies and the lockfile are pinned, while Node.js 22 or newer is required.
 
-For the current Next.js target, investigate standalone output tracing for product files and native dependencies. Validate filesystem, transcript, binary, subprocess, streaming, cancellation, and persistence behavior before selecting any serverless host.
+Standalone output tracing includes the compiled product, public evidence assets, and only the active platform's native Claude Agent SDK package. The local persistent Node process is the validated deployment baseline; hosted compatibility is not yet claimed.
 
 ## Unresolved work
 
-- Which Claude Agent SDK deployment environments reliably support required runtime behavior?
+- Which hosted Claude Agent SDK environments reliably support the validated local runtime behavior?
 - Will the final 3D representation remain procedural or move to a reviewed GLB asset?
-- Which ingestion stages require human review for this delivery?
-- Is semantic retrieval worth its package and startup cost for a three-document corpus?
+- Is semantic retrieval worth its package and startup cost for a three-document corpus beyond the current structured search?
 - Which voice transcription path preserves the single-key setup requirement?
 - How should uploaded images be retained or deleted in hosted deployments?
 

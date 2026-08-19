@@ -2,9 +2,9 @@
 
 <img src="files/product.webp" alt="Vulcan OmniPro 220" width="400" /> <img src="files/product-inside.webp" alt="Vulcan OmniPro 220 — inside panel" width="400" />
 
-## Solution Design
+## OmniPro Product Twin
 
-> **Status:** Implementation in progress. The canonical Next.js onboarding, standalone production build, and baseline CI are implemented. Product-twin and agent-runtime work remain tracked in the [implementation plan](docs/plans/implementation-plan.md).
+> **Status:** The challenge runtime is implemented end to end. It includes a compiled source-backed product package, bounded Claude Agent SDK adapter, interactive product twin, exact evidence viewer, executable procedures, deterministic artifacts, and automated acceptance gates. Live Claude verification requires an evaluator-supplied `ANTHROPIC_API_KEY`.
 
 Documentation is separated by lifecycle:
 
@@ -13,6 +13,59 @@ Documentation is separated by lifecycle:
 - [Challenge Requirements and Evaluator Scope](docs/challenge/requirements.md): time-bound delivery and submission context
 - [ADR 0001: Use Next.js for the production application](docs/adr/0001-use-nextjs.md): framework decision and rationale
 - [Implementation Plan](docs/plans/implementation-plan.md): prototype lineage, migration, milestones, and unresolved work
+
+## Run Locally
+
+Requirements: Node.js 22 or newer and one Anthropic API key.
+
+```bash
+git clone <your-fork>
+cd prox-challenge
+cp .env.example .env
+# Add your Anthropic API key to .env
+npm ci
+npm run dev
+```
+
+Open <http://localhost:3000>. No database, vector service, ingestion run, or additional credential is required. The submitted runtime consumes the precompiled package under `products/omnipro-220/product-dist/v1/`.
+
+For a production-equivalent local run:
+
+```bash
+npm run build
+npm start
+```
+
+If no key is present, the UI visibly enters a deterministic evidence-engine fallback. This fallback keeps the evaluated journeys inspectable offline, but it is not presented as a live Claude turn.
+
+## What to Evaluate
+
+- **TIG setup:** synchronized six-step checklist, product-state confirmation, socket focus, polarity diagram, and exact manual pages 24–25.
+- **MIG and flux-core polarity:** DCEP/DCEN guidance, incompatible-state constraints, connection animation, and exact manual pages 13–14.
+- **Duty cycle:** published-only 240 V / 200 A result of 25%, shown as 2.5 minutes welding and 7.5 minutes resting with page 19 evidence.
+- **Porosity diagnosis:** process-aware response and an adaptive troubleshooting graph that does not apply MIG gas advice to self-shielded flux-core.
+- **Visual-only retrieval:** the original process-selection chart is shown rather than replaced with generated prose.
+- **Ambiguity:** a 1/8-inch steel settings request asks for process, input voltage, wire or electrode, and shielding-gas context.
+- **Click to explain:** selecting a source-bound 3D part resolves local facts, related procedures, warnings, and evidence without an agent round trip.
+
+## How It Works
+
+1. `scripts/compile-product.ts` deterministically validates the five supplied source assets, their SHA-256 hashes, exact evidence renders, verified facts, procedures, scene bindings, constraints, and acceptance cases.
+2. The server-side product store reads that immutable package. Product MCP tools expose only validated lookup, evidence, procedure, twin-state, scene-command, clarification, and artifact operations.
+3. `POST /api/agent` runs a bounded Claude Agent SDK turn with no shell, filesystem, web, task, or write tools. It enforces request size, origin, timeout, turn, budget, output, concurrency, session, schema, and scene-entity limits.
+4. The client validates ordered SSE events and projects them into one revisioned twin state, a deterministic Three.js scene, source evidence, procedure controls, and allowlisted artifacts.
+
+Source evidence, verified reconstruction, and explanatory guidance remain visually distinct. Original document hashes and source coordinates remain canonical; local search and generated explanation are replaceable projections.
+
+## Validation
+
+```bash
+npm run validate
+```
+
+This runs the product-package hash gate, procedural-model gate, TypeScript, 50 deterministic/unit/integration tests, and the production standalone build. CI runs the same gates from `npm ci`. The standalone trace includes only the active platform's Claude Agent SDK binary, the compiled product package, and browser assets.
+
+Current deliberate limitations: sessions are in-memory and expire after 30 idle minutes; restart is explicit session loss; the procedural 3D reconstruction is evidence-bound but not dimensionally authoritative; image-assisted diagnosis, voice control, uploads, hosting, and video remain secondary scope.
 
 ## The Product
 
@@ -86,9 +139,10 @@ We should be running your agent within 2 minutes of cloning your repo:
 ```bash
 git clone <your-fork>
 cd <your-fork>
-cp .env.example .env   # we plug in our own Anthropic API key
-# your install command (npm install, uv install, etc.)
-# your run command (npm run dev, python app.py, etc.)
+cp .env.example .env
+# Add your Anthropic API key to .env
+npm ci
+npm run dev
 ```
 
 If it takes longer than that to set up, that's a problem.
