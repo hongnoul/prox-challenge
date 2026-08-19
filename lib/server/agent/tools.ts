@@ -4,6 +4,7 @@ import type { TwinState } from "@/lib/shared/contracts/twin-state";
 import { sceneCommandSchema, twinPatchSchema } from "@/lib/shared/contracts/product";
 import { validateConfiguration } from "@/lib/shared/domain";
 import { productStore } from "@/lib/server/product/store";
+import { normalizeArtifactRequest } from "./artifacts";
 
 const asText = (value: unknown) => ({
   content: [{ type: "text" as const, text: JSON.stringify(value) }],
@@ -102,10 +103,15 @@ export function createProductTools(twinState: TwinState) {
           ? asText({ accepted: true, commands: validated })
           : { ...asText({ accepted: false, error: "Scene command references an unknown product entity" }), isError: true };
       }),
-      tool("open_artifact", "Open an allowlisted deterministic artifact in the user interface.", {
+      tool("open_artifact", "Open an allowlisted deterministic artifact in the user interface. Required props: duty-cycle needs dutyCyclePercent and amperage (weldMinutes/restMinutes are derived when omitted); polarity needs process, wire or torch, and ground; troubleshooting needs pathId; source-comparison needs evidenceId.", {
         artifactType: z.enum(["duty-cycle", "polarity", "troubleshooting", "source-comparison"]),
         props: z.record(z.string(), z.unknown()),
-      }, async ({ artifactType, props }) => asText({ artifactType, props })),
+      }, async ({ artifactType, props }) => {
+        const artifact = normalizeArtifactRequest({ artifactType, props });
+        return artifact
+          ? asText({ accepted: true, ...artifact })
+          : { ...asText({ accepted: false, error: "Artifact props were missing required values" }), isError: true };
+      }),
     ],
   });
 }

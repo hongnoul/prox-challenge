@@ -60,6 +60,12 @@ describe("bounded Claude Agent SDK adapter", () => {
               name: "mcp__omnipro__emit_scene_commands",
               input: { commands: [{ type: "focus-part", entityId: "front-negative-socket" }] },
             },
+            {
+              type: "tool_use",
+              id: "tool-3",
+              name: "mcp__omnipro__open_artifact",
+              input: { artifactType: "duty-cycle", props: { dutyCyclePercent: 25, amperage: 200 } },
+            },
           ],
         },
       };
@@ -92,11 +98,22 @@ describe("bounded Claude Agent SDK adapter", () => {
       "citation",
       "tool-start",
       "scene-command",
+      "tool-start",
+      "artifact-request",
       "complete",
     ]);
     expect(written.find(({ type }) => type === "citation")?.payload).toEqual({
       evidenceId: "ev-tig-connections-p24",
       label: "ev-tig-connections-p24",
+    });
+    expect(written.find(({ type }) => type === "artifact-request")?.payload).toEqual({
+      artifactType: "duty-cycle",
+      props: {
+        dutyCyclePercent: 25,
+        amperage: 200,
+        weldMinutes: 2.5,
+        restMinutes: 7.5,
+      },
     });
 
     const options = sdk.query.mock.calls[0]?.[0]?.options;
