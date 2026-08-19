@@ -53,4 +53,3 @@ export function sessionCount() {
   removeExpiredSessions();
   return sessions.size;
 }
-

@@ -50,4 +50,3 @@ export function validateConfiguration(state: TwinState): ConstraintFinding[] {
   }
   return findings;
 }
-

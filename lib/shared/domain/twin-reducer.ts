@@ -39,4 +39,3 @@ export function applyTwinPatch(current: TwinState, requestInput: TwinPatchReques
   }
   return { applied: true, state: candidate };
 }
-

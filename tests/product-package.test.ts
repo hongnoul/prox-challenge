@@ -53,4 +53,3 @@ describe("compiled OmniPro product package", () => {
     ]));
   });
 });
-

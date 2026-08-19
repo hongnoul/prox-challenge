@@ -46,4 +46,3 @@ describe("deterministic product behavior", () => {
     })).toMatchObject({ applied: false, reason: "stale-revision" });
   });
 });
-
