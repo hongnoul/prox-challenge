@@ -38,11 +38,144 @@ textarea {
   font: inherit;
 }
 
+.login-shell {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 50% -10%, rgb(240 90 40 / 16%), transparent 34rem),
+    linear-gradient(145deg, #0d100e, var(--powder-coat));
+}
+
+.login-card {
+  width: min(100%, 27rem);
+  border: 1px solid rgb(241 243 239 / 12%);
+  border-radius: 1.25rem;
+  background: rgb(27 32 29 / 84%);
+  box-shadow: 0 2rem 6rem rgb(0 0 0 / 35%);
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  backdrop-filter: blur(1.5rem);
+}
+
+.login-mark {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: 2.5rem;
+  place-items: center;
+  border: 1px solid rgb(240 90 40 / 62%);
+  border-radius: 0.7rem;
+  background: rgb(240 90 40 / 11%);
+  color: var(--signal);
+  font-family: "Arial Narrow", sans-serif;
+  font-weight: 900;
+}
+
+.login-card .machine-label {
+  margin-bottom: 0.8rem;
+}
+
+.login-card h1 {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  font-weight: 460;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.login-copy {
+  margin: 1rem 0 2rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.login-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.login-form label {
+  color: #c7ccc8;
+  font-size: 0.7rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-form input {
+  width: 100%;
+  min-height: 3.1rem;
+  border: 1px solid var(--steel-light);
+  border-radius: 0.65rem;
+  outline: 0;
+  background: #111512;
+  color: var(--chalk);
+  padding: 0.8rem 0.9rem;
+}
+
+.login-form input:focus {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 3px rgb(240 90 40 / 14%);
+}
+
+.login-form input[aria-invalid="true"] {
+  border-color: #df7458;
+}
+
+.login-form button {
+  min-height: 3.1rem;
+  margin-top: 0.4rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: var(--signal);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 760;
+}
+
+.login-form button:hover {
+  background: var(--signal-dark);
+}
+
+.login-error {
+  margin: 0;
+  color: #f29a83;
+  font-size: 0.78rem;
+}
+
 .onboarding-shell {
+  position: relative;
   display: grid;
   min-height: 100svh;
   place-items: center;
   padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+.onboarding-logout {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.onboarding-logout button,
+.workspace-logout button {
+  appearance: none;
+  border: 1px solid rgb(241 243 239 / 13%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 3%);
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.45rem 0.72rem;
+  font-size: 0.62rem;
+  font-weight: 720;
+  letter-spacing: 0.04em;
+}
+
+.onboarding-logout button:hover,
+.workspace-logout button:hover {
+  border-color: rgb(240 90 40 / 55%);
+  color: var(--chalk);
 }
 
 .intent-picker {
@@ -663,6 +796,13 @@ textarea {
   font-size: 0.65rem;
   font-weight: 680;
   letter-spacing: 0.025em;
+}
+
+.workspace-account {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
 }
 
 .workspace-session > span {

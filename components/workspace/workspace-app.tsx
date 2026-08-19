@@ -107,6 +107,14 @@ function applyConfirmedValues(state: TwinState, values: ClarificationValues): Tw
   return next;
 }
 
+function LogoutButton({ className }: { className?: string }) {
+  return (
+    <form className={className} action="/api/auth/logout" method="post">
+      <button type="submit">Lock workspace</button>
+    </form>
+  );
+}
+
 export function WorkspaceApp() {
   const [intent, setIntent] = useState<IntentId | null>(null);
   const [messages, setMessages] = useState<WorkspaceMessage[]>([]);
@@ -411,6 +419,7 @@ export function WorkspaceApp() {
   if (!intent) {
     return (
       <main className="onboarding-shell">
+        <LogoutButton className="onboarding-logout" />
         <IntentBubbles onSelectIntent={setIntent} />
       </main>
     );
@@ -442,9 +451,12 @@ export function WorkspaceApp() {
           ))}
         </nav>
 
-        <div className="workspace-session" data-status={sessionStatus}>
-          <span aria-hidden="true" />
-          {sessionStatus === "starting" ? "Starting session" : sessionStatus === "ready" ? "Session ready" : "Session on demand"}
+        <div className="workspace-account">
+          <div className="workspace-session" data-status={sessionStatus}>
+            <span aria-hidden="true" />
+            {sessionStatus === "starting" ? "Starting session" : sessionStatus === "ready" ? "Session ready" : "Session on demand"}
+          </div>
+          <LogoutButton className="workspace-logout" />
         </div>
       </header>
 
