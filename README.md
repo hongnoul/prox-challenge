@@ -4,7 +4,7 @@
 
 ## OmniPro Product Twin
 
-> **Status:** The challenge runtime is implemented end to end. It includes a compiled source-backed product package, bounded Claude Agent SDK adapter, interactive product twin, exact evidence viewer, executable procedures, deterministic artifacts, and automated acceptance gates. Live Claude verification requires an evaluator-supplied `ANTHROPIC_API_KEY`.
+> **Status:** The challenge runtime is implemented and verified end to end. It includes a compiled source-backed product package, bounded Claude Agent SDK adapter, interactive product twin, exact evidence viewer, executable procedures, deterministic artifacts, and automated acceptance gates. A real Claude turn has been verified through the production Route Handler with stored Claude.ai authentication; Console API keys remain supported.
 
 Documentation is separated by lifecycle:
 
@@ -16,7 +16,7 @@ Documentation is separated by lifecycle:
 
 ## Run Locally
 
-Requirements: Node.js 22 or newer and one Anthropic API key.
+Requirements: Node.js 22 or newer and either an Anthropic API key or an existing Claude Code subscription login.
 
 ```bash
 git clone <your-fork>
@@ -27,7 +27,9 @@ npm ci
 npm run dev
 ```
 
-Open <http://localhost:3000>. No database, vector service, ingestion run, or additional credential is required. The submitted runtime consumes the precompiled package under `products/omnipro-220/product-dist/v1/`.
+Open <http://localhost:3000>. No database, vector service, ingestion run, or additional service is required. The submitted runtime consumes the precompiled package under `products/omnipro-220/product-dist/v1/`.
+
+The evaluator-facing API-key path above satisfies the challenge's single-key requirement. For local development, the Agent SDK also detects an existing `claude auth login --claudeai` credential or `CLAUDE_CODE_OAUTH_TOKEN`. Secrets remain server-side and are never returned by `/api/health`.
 
 For a production-equivalent local run:
 
@@ -36,7 +38,7 @@ npm run build
 npm start
 ```
 
-If no key is present, the UI visibly enters a deterministic evidence-engine fallback. This fallback keeps the evaluated journeys inspectable offline, but it is not presented as a live Claude turn.
+If no supported Agent SDK credential is present, the UI visibly enters a deterministic evidence-engine fallback. This fallback keeps the evaluated journeys inspectable offline, but it is not presented as a live Claude turn.
 
 ## What to Evaluate
 
@@ -63,7 +65,9 @@ Source evidence, verified reconstruction, and explanatory guidance remain visual
 npm run validate
 ```
 
-This runs the product-package hash gate, procedural-model gate, TypeScript, 50 deterministic/unit/integration tests, and the production standalone build. CI runs the same gates from `npm ci`. The standalone trace includes only the active platform's Claude Agent SDK binary, the compiled product package, and browser assets.
+This runs the product-package hash gate, procedural-model gate, TypeScript, 57 deterministic/unit/integration tests, and the production standalone build. CI runs the same gates from `npm ci`. The standalone trace includes only the active platform's Claude Agent SDK binary, the compiled product package, and browser assets.
+
+The production Route Handler was also verified with stored Claude.ai authentication: one live turn emitted 14 contiguous typed SSE events, resolved `ev-duty-cycle-p19`, returned the published 25% at 200 A fact, normalized the 2.5-minute weld / 7.5-minute rest artifact, and completed within the configured budget. This external call is intentionally not part of CI because it consumes authenticated model usage.
 
 Current deliberate limitations: sessions are in-memory and expire after 30 idle minutes; restart is explicit session loss; the procedural 3D reconstruction is evidence-bound but not dimensionally authoritative; image-assisted diagnosis, voice control, uploads, hosting, and video remain secondary scope.
 

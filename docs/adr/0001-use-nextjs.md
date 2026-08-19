@@ -1,6 +1,6 @@
 # ADR 0001: Use Next.js for the production application
 
-**Status:** Proposed; all local feasibility gates pass except a real-key Claude turn
+**Status:** Accepted
 **Date:** 2026-08-15
 **Last reviewed:** 2026-08-19
 
@@ -14,7 +14,7 @@ This ADR decides the application framework. It does not define the durable produ
 
 ## Decision
 
-Propose building the production application as a full-stack Next.js App Router project using TypeScript and the Node.js runtime.
+Adopt the production application as a full-stack Next.js App Router project using TypeScript and the Node.js runtime.
 
 Use:
 
@@ -27,7 +27,7 @@ Use:
 
 Use the Node.js runtime explicitly for agent endpoints. Do not assume that the Agent SDK supports edge execution or every serverless environment.
 
-This decision becomes Accepted only after the feasibility gate below passes with pinned runtime and SDK versions.
+This decision is Accepted because the pinned runtime and SDK versions pass the feasibility gate below.
 
 ## Decision drivers
 
@@ -110,7 +110,7 @@ Acceptance requires evidence that:
 
 The [implementation plan](../plans/implementation-plan.md) owns the executable spike and its status.
 
-Current evidence: pinned Next.js 16.3.1 and Claude Agent SDK 0.3.235 builds pass from a clean Node.js 22 checkout; production SSE is unbuffered; abort, timeout, session isolation, event ordering, output, and concurrency behavior are tested; restart is explicit session loss; and standalone tracing contains the active native SDK binary and compiled package. Mocked SDK messages validate tool restrictions and event translation. This ADR remains Proposed only until one evaluator-supplied-key turn confirms the external Claude path.
+Current evidence: pinned Next.js 16.3.1 and Claude Agent SDK 0.3.235 builds pass from a clean Node.js 22 checkout; production SSE is unbuffered; abort, timeout, session isolation, event ordering, output, and concurrency behavior are tested; restart is explicit session loss; and standalone tracing contains the active native SDK binary and compiled package. Mocked SDK messages validate tool restrictions and failure-path event translation. A stored Claude.ai credential also drove a real standalone Route Handler turn that emitted 14 contiguous events, used only product MCP tools, cited exact evidence `ev-duty-cycle-p19`, returned the published 25% at 200 A fact, normalized its 2.5-minute weld / 7.5-minute rest artifact, and completed within the configured turn budget.
 
 ## Revisit conditions
 

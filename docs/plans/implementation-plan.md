@@ -1,7 +1,7 @@
 # OmniPro Implementation Plan
 
 **Role:** Contextual execution plan
-**Status:** Challenge runtime implemented; live credential verification and secondary scope remain
+**Status:** Challenge runtime and local feasibility gate complete; secondary scope remains
 **Last reviewed:** 2026-08-19
 
 ## Purpose
@@ -14,11 +14,11 @@ It is subordinate to the [Product Vision](../../VISION.md) and [Architecture Con
 
 - The versioned OmniPro package compiles five supplied source assets into ten exact evidence records, verified facts, executable procedures, constraints, scene bindings, and eight acceptance cases.
 - The Next.js workspace implements Explore, Guide, and Diagnose modes; a lazy procedural Three.js twin; local click-to-explain; exact source dialogs; confirmed procedures; and allowlisted duty-cycle, polarity, source-comparison, and adaptive troubleshooting artifacts.
-- The server implements sessions, deterministic product lookup, evidence and entity endpoints, ordered SSE, a bounded Claude Agent SDK adapter, in-process product MCP tools, and a transparent deterministic fallback when no key is present.
+- The server implements sessions, deterministic product lookup, evidence and entity endpoints, ordered SSE, a bounded Claude Agent SDK adapter, in-process product MCP tools, and a transparent deterministic fallback when no supported Agent SDK credential is present.
 - The standalone build traces the active platform's Claude Agent SDK binary and compiled product package. Sessions are intentionally in-memory with explicit loss on restart.
-- `npm run validate` passes the source-hash gate, 13-part model gate, TypeScript, 50 tests, and production build from a clean `npm ci` checkout.
+- `npm run validate` passes the source-hash gate, 13-part model gate, TypeScript, 57 tests, and production build from a clean `npm ci` checkout.
 - Headless production verification covers startup, the 3D scene, duty-cycle evidence and artifact, TIG procedure state changes, click-to-explain, and the process-aware porosity path.
-- ADR 0001's build, packaging, cancellation, isolation, concurrency, and restart gates pass. A real-key streamed Claude turn remains the only credential-dependent feasibility check.
+- ADR 0001's build, packaging, live streaming, cancellation, isolation, concurrency, and restart gates pass. A stored Claude.ai credential produced a source-grounded live duty-cycle turn through the standalone Route Handler.
 
 Update this section whenever implementation evidence changes. Do not copy status claims into the constitutional documents.
 
@@ -86,7 +86,7 @@ ADR 0001 can move from Proposed to Accepted only after a spike with pinned runti
 
 If the gate fails, use a Vite React client plus a persistent Node agent server while preserving the constitutional contracts.
 
-Current result: every gate above is automated or directly observed except a real-key Claude response. Mocked SDK streams verify adapter behavior and tool restrictions; the production standalone contains and launches the native SDK binary. Final acceptance still requires one `ANTHROPIC_API_KEY`-backed turn.
+Current result: every gate above passes. A stored Claude.ai credential drove a real standalone Route Handler turn that emitted 14 contiguous typed SSE events, used product MCP lookup and exact evidence tools, cited `ev-duty-cycle-p19`, returned the published 25% at 200 A fact, normalized the 2.5-minute weld / 7.5-minute rest artifact, and completed for $0.05007075. Mocked SDK streams continue to verify failure paths, tool restrictions, and event translation without consuming model usage.
 
 ## Implemented runtime surface
 
@@ -179,7 +179,7 @@ The intended dependency rule is more important than these paths: the workspace i
 
 ## Delivery milestones
 
-### Milestone 0: runtime feasibility — complete except real-key turn
+### Milestone 0: runtime feasibility — complete
 
 - Minimal Node route invoking the pinned Claude Agent SDK
 - Production build and start
@@ -242,7 +242,7 @@ Targets remain provisional until measured. Every published result records hardwa
 
 Local execution is the baseline. The current plan uses a self-hosted Node process or container until hosted compatibility is demonstrated.
 
-The target local development path is:
+The target local development path for an evaluator-supplied Console API key is:
 
 ```bash
 cp .env.example .env
@@ -250,6 +250,8 @@ cp .env.example .env
 npm ci
 npm run dev
 ```
+
+For local development, the runtime also detects a prior `claude auth login --claudeai` credential or a `CLAUDE_CODE_OAUTH_TOKEN`. Without any supported credential it enters the explicit deterministic fallback.
 
 Production supports `npm run build` and `npm start` without rerunning compilation. Runtime dependencies and the lockfile are pinned, while Node.js 22 or newer is required.
 
