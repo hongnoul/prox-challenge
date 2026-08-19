@@ -89,4 +89,22 @@ describe("deterministic AgentEvent streams", () => {
     });
     expectOrderedSingleTerminal(events, "error");
   });
+
+  it("terminates an already-cancelled request without running the engine", async () => {
+    const requestController = new AbortController();
+    requestController.abort(new Error("client left"));
+    const { stream } = createAgentEventStream({
+      message: "do not run",
+      twinState: createInitialTwinState(),
+    }, requestController.signal);
+
+    const events = await collectEvents(stream);
+
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      type: "error",
+      payload: { code: "aborted", message: "client left" },
+    });
+    expect(answerDeterministically).not.toHaveBeenCalled();
+  });
 });

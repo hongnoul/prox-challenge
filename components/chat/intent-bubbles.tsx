@@ -20,7 +20,7 @@ export const intentOptions: IntentOption[] = [
   {
     id: "guide",
     label: "Guide me through a job",
-    response: "Start with the job, material, process, or a photo of what you need to weld.",
+    response: "Start with the job, material, process, or connection you need to set up.",
   },
   {
     id: "diagnose",

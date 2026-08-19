@@ -16,6 +16,8 @@ export function EvidenceDrawer({ evidenceId, onClose }: EvidenceDrawerProps) {
   const [result, setResult] = useState<EvidenceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!evidenceId) {
@@ -34,18 +36,21 @@ export function EvidenceDrawer({ evidenceId, onClose }: EvidenceDrawerProps) {
           setError(reason instanceof Error ? reason.message : "Could not load source evidence.");
         }
       });
-    window.requestAnimationFrame(() => closeRef.current?.focus());
     return () => controller.abort();
   }, [evidenceId]);
 
   useEffect(() => {
     if (!evidenceId) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (!dialog.open) dialog.showModal();
+    window.requestAnimationFrame(() => closeRef.current?.focus({ preventScroll: true }));
+    return () => {
+      if (dialog.open) dialog.close();
+      openerRef.current?.focus({ preventScroll: true });
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [evidenceId, onClose]);
+  }, [evidenceId]);
 
   if (!evidenceId) return null;
 
@@ -53,18 +58,21 @@ export function EvidenceDrawer({ evidenceId, onClose }: EvidenceDrawerProps) {
   const bounds = evidence?.bounds;
 
   return (
-    <div
+    <dialog
+      ref={dialogRef}
       className="evidence-backdrop"
-      onMouseDown={(event) => {
+      aria-labelledby="evidence-title"
+      aria-describedby="evidence-description"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+      onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <aside
+      <section
         className="evidence-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="evidence-title"
-        aria-describedby="evidence-description"
       >
         <header className="evidence-header">
           <div>
@@ -134,7 +142,7 @@ export function EvidenceDrawer({ evidenceId, onClose }: EvidenceDrawerProps) {
             </section>
           </div>
         ) : null}
-      </aside>
-    </div>
+      </section>
+    </dialog>
   );
 }

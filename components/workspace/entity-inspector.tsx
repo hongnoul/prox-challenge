@@ -44,6 +44,22 @@ export function EntityInspector({
           ) : (
             <p className="entity-no-facts">No additional verified facts are linked to this part.</p>
           )}
+          {result.warnings.length > 0 ? (
+            <div className="entity-warnings" role="note">
+              <span>Warnings</span>
+              {result.warnings.map((warning) => <p key={warning}>{warning}</p>)}
+            </div>
+          ) : null}
+          {result.relatedProcedures.length > 0 ? (
+            <div className="entity-procedures">
+              <span>Related procedures</span>
+              <ul>
+                {result.relatedProcedures.map((procedure) => (
+                  <li key={procedure.id}><strong>{procedure.title}</strong><small>{procedure.summary}</small></li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <div className="entity-evidence" aria-label="Part evidence">
             {result.evidence.map((evidence) => (
               <button key={evidence.id} type="button" onClick={() => onOpenEvidence(evidence.id)}>

@@ -22,6 +22,7 @@ import {
   type SceneCommand,
   type TwinState,
 } from "@/lib/shared/contracts";
+import { applyTwinPatch } from "@/lib/shared/domain";
 
 const suggestionsByIntent: Record<IntentId, string[]> = {
   explore: [
@@ -114,6 +115,7 @@ export function WorkspaceApp() {
   const [commandRevision, setCommandRevision] = useState(0);
   const [artifacts, setArtifacts] = useState<WorkspaceArtifact[]>([]);
   const [procedure, setProcedure] = useState<ProcedureState | null>(null);
+  const [procedureNotice, setProcedureNotice] = useState<string | null>(null);
   const [evidenceId, setEvidenceId] = useState<string | null>(null);
   const [product, setProduct] = useState<ProductSummary | null>(null);
   const [selectedEntity, setSelectedEntity] = useState<EntityResponse | null>(null);
@@ -243,6 +245,7 @@ export function WorkspaceApp() {
         const nextProcedure = payloadFor<"procedure-progress">(event);
         if (typeof nextProcedure.procedureId !== "string" || !Number.isInteger(nextProcedure.stepIndex)) break;
         setProcedure(nextProcedure);
+        setProcedureNotice(null);
         setTwinState((current) => {
           if (current.activeProcedureId === nextProcedure.procedureId) return current;
           const next = {
@@ -352,6 +355,59 @@ export function WorkspaceApp() {
     });
   }, []);
 
+  const activeIntent = intentOptions.find(({ id }) => id === intent);
+  const activeProcedure = product?.procedures.find(({ id }) => id === procedure?.procedureId);
+
+  const stageProcedureStep = useCallback((stepIndex: number) => {
+    if (!procedure) return;
+    const selectedProcedure = product?.procedures.find(({ id }) => id === procedure.procedureId);
+    if (!selectedProcedure) return;
+    const boundedIndex = Math.max(0, Math.min(stepIndex, selectedProcedure.steps.length - 1));
+    const step = selectedProcedure.steps[boundedIndex];
+    setProcedure({ procedureId: selectedProcedure.id, stepIndex: boundedIndex });
+    setSceneCommands(step.sceneCommands);
+    setCommandRevision((revision) => revision + 1);
+    setProcedureNotice(null);
+  }, [procedure, product]);
+
+  const confirmProcedureStep = useCallback(() => {
+    if (!procedure || !activeProcedure) return;
+    const step = activeProcedure.steps[procedure.stepIndex];
+    if (!step) return;
+    const current = twinStateRef.current;
+    let next: TwinState;
+
+    if (step.proposedTwinPatch) {
+      const applied = applyTwinPatch(current, {
+        expectedRevision: current.revision,
+        patch: step.proposedTwinPatch,
+        source: "user-confirmed",
+        confirmed: true,
+      });
+      if (!applied.applied) {
+        setProcedureNotice(applied.messages.join(" "));
+        return;
+      }
+      next = applied.state;
+    } else {
+      next = { ...current, revision: current.revision + 1 };
+    }
+
+    next = {
+      ...next,
+      activeProcedureId: activeProcedure.id,
+      completedStepIds: [...new Set([...next.completedStepIds, step.id])],
+    };
+    twinStateRef.current = next;
+    setTwinState(next);
+
+    if (procedure.stepIndex >= activeProcedure.steps.length - 1) {
+      setProcedureNotice("Procedure complete. The twin reflects only the steps you confirmed.");
+      return;
+    }
+    stageProcedureStep(procedure.stepIndex + 1);
+  }, [activeProcedure, procedure, stageProcedureStep]);
+
   if (!intent) {
     return (
       <main className="onboarding-shell">
@@ -359,9 +415,6 @@ export function WorkspaceApp() {
       </main>
     );
   }
-
-  const activeIntent = intentOptions.find(({ id }) => id === intent);
-  const activeProcedure = product?.procedures.find(({ id }) => id === procedure?.procedureId);
 
   return (
     <main className="workspace-shell">
@@ -464,10 +517,30 @@ export function WorkspaceApp() {
               <p className="eyebrow">Procedure staged</p>
               <h2 id="procedure-title">{activeProcedure?.title ?? procedureLabel(procedure.procedureId)}</h2>
               <p>{activeProcedure?.summary ?? "The agent has opened a source-backed procedure."}</p>
-              <div className="procedure-progress" aria-label={`Procedure step ${procedure.stepIndex + 1}${activeProcedure ? ` of ${activeProcedure.stepCount}` : ""}`}>
-                <span style={{ width: activeProcedure ? `${Math.min(100, ((procedure.stepIndex + 1) / activeProcedure.stepCount) * 100)}%` : "18%" }} />
+              <div className="procedure-progress" aria-label={`Procedure step ${procedure.stepIndex + 1}${activeProcedure ? ` of ${activeProcedure.steps.length}` : ""}`}>
+                <span style={{ width: activeProcedure ? `${Math.min(100, ((procedure.stepIndex + 1) / activeProcedure.steps.length) * 100)}%` : "18%" }} />
               </div>
-              <small>Step {procedure.stepIndex + 1}{activeProcedure ? ` of ${activeProcedure.stepCount}` : ""} ready</small>
+              <small>Step {procedure.stepIndex + 1}{activeProcedure ? ` of ${activeProcedure.steps.length}` : ""} ready</small>
+              {activeProcedure?.steps[procedure.stepIndex] ? (
+                <div className="procedure-step" aria-live="polite">
+                  <strong>{activeProcedure.steps[procedure.stepIndex].title}</strong>
+                  <p>{activeProcedure.steps[procedure.stepIndex].instruction}</p>
+                  {activeProcedure.steps[procedure.stepIndex].warning ? (
+                    <p className="procedure-warning" role="note">{activeProcedure.steps[procedure.stepIndex].warning}</p>
+                  ) : null}
+                  <div className="procedure-evidence" aria-label="Evidence for this step">
+                    {activeProcedure.steps[procedure.stepIndex].evidenceIds.map((id) => (
+                      <button key={id} type="button" onClick={() => setEvidenceId(id)}>View source</button>
+                    ))}
+                  </div>
+                  <div className="procedure-actions">
+                    <button type="button" onClick={() => stageProcedureStep(procedure.stepIndex - 1)} disabled={procedure.stepIndex === 0}>Back</button>
+                    <button type="button" onClick={() => stageProcedureStep(procedure.stepIndex)}>Repeat focus</button>
+                    <button type="button" onClick={confirmProcedureStep}>Confirm step</button>
+                  </div>
+                </div>
+              ) : null}
+              {procedureNotice ? <p className="procedure-notice" role="status">{procedureNotice}</p> : null}
             </section>
           ) : null}
 
@@ -477,6 +550,7 @@ export function WorkspaceApp() {
               artifact={artifact}
               onDismiss={(id) => setArtifacts((current) => current.filter((item) => item.id !== id))}
               onOpenEvidence={setEvidenceId}
+              troubleshootingPath={product?.troubleshootingPaths.find(({ id }) => id === artifact.props.pathId)}
             />
           )) : (
             <section className="rail-empty">

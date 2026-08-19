@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { TroubleshootingFlow } from "@/components/artifacts";
+import type { ProductSummary } from "@/lib/client/api";
 
 export type WorkspaceArtifact = {
   id: string;
@@ -10,6 +12,7 @@ type ArtifactSurfaceProps = {
   artifact: WorkspaceArtifact;
   onDismiss: (id: string) => void;
   onOpenEvidence: (evidenceId: string) => void;
+  troubleshootingPath?: ProductSummary["troubleshootingPaths"][number];
 };
 
 const titleByType: Record<WorkspaceArtifact["artifactType"], string> = {
@@ -74,14 +77,32 @@ function PolarityArtifact({ props }: { props: Record<string, unknown> }) {
   );
 }
 
-function TroubleshootingArtifact({ props }: { props: Record<string, unknown> }) {
+function TroubleshootingArtifact({
+  props,
+  path,
+  onOpenEvidence,
+}: {
+  props: Record<string, unknown>;
+  path?: ProductSummary["troubleshootingPaths"][number];
+  onOpenEvidence: (evidenceId: string) => void;
+}) {
   const process = textProp(props, "process") ?? "wire welding";
-  const path = textProp(props, "pathId") ?? "documented path";
-  return (
+  const fallbackPathId = textProp(props, "pathId") ?? "documented path";
+  return path ? (
+    <>
+      <div className="diagnostic-context" role="note">
+        <span>Current diagnostic context</span>
+        <strong>{process.replaceAll("-", " ")}</strong>
+        {process === "flux-core" ? <small>Expected polarity: DCEN. Gas checks do not apply to self-shielded wire.</small> : null}
+        {process === "mig" ? <small>Expected polarity: DCEP. Include shielding-gas checks.</small> : null}
+      </div>
+      <TroubleshootingFlow path={path} onEvidenceSelect={onOpenEvidence} />
+    </>
+  ) : (
     <div className="diagnostic-path">
       <p><span>Context</span><strong>{process.replaceAll("-", " ")}</strong></p>
       <div aria-hidden="true" />
-      <p><span>Evidence path</span><strong>{path.replace(/^troubleshoot-/, "").replaceAll("-", " ")}</strong></p>
+      <p><span>Evidence path</span><strong>{fallbackPathId.replace(/^troubleshoot-/, "").replaceAll("-", " ")}</strong></p>
       <small>Continue in chat so each check can be confirmed before the next one.</small>
     </div>
   );
@@ -116,7 +137,7 @@ function SourceComparisonArtifact({
   );
 }
 
-export function ArtifactSurface({ artifact, onDismiss, onOpenEvidence }: ArtifactSurfaceProps) {
+export function ArtifactSurface({ artifact, onDismiss, onOpenEvidence, troubleshootingPath }: ArtifactSurfaceProps) {
   return (
     <article className="artifact-card" aria-labelledby={`artifact-${artifact.id}`}>
       <header>
@@ -136,7 +157,9 @@ export function ArtifactSurface({ artifact, onDismiss, onOpenEvidence }: Artifac
       <div className="artifact-body">
         {artifact.artifactType === "duty-cycle" ? <DutyCycleArtifact props={artifact.props} /> : null}
         {artifact.artifactType === "polarity" ? <PolarityArtifact props={artifact.props} /> : null}
-        {artifact.artifactType === "troubleshooting" ? <TroubleshootingArtifact props={artifact.props} /> : null}
+        {artifact.artifactType === "troubleshooting" ? (
+          <TroubleshootingArtifact props={artifact.props} path={troubleshootingPath} onOpenEvidence={onOpenEvidence} />
+        ) : null}
         {artifact.artifactType === "source-comparison" ? (
           <SourceComparisonArtifact props={artifact.props} onOpenEvidence={onOpenEvidence} />
         ) : null}

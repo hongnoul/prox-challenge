@@ -2,7 +2,9 @@ import {
   entitySchema,
   evidenceRegionSchema,
   factSchema,
+  procedureSchema,
   sourceDocumentSchema,
+  troubleshootingPathSchema,
   twinStateSchema,
   type TwinState,
 } from "@/lib/shared/contracts";
@@ -24,6 +26,14 @@ const entityResponseSchema = z.object({
   entity: entitySchema,
   facts: z.array(factSchema),
   evidence: z.array(evidenceRegionSchema),
+  relatedProcedures: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    summary: z.string(),
+    process: z.string(),
+    evidenceIds: z.array(z.string()),
+  })),
+  warnings: z.array(z.string()),
 });
 
 const productSummarySchema = z.object({
@@ -43,14 +53,8 @@ const productSummarySchema = z.object({
     evidenceIds: z.array(z.string()),
     sceneBindingId: z.string().optional(),
   })),
-  procedures: z.array(z.object({
-    id: z.string(),
-    title: z.string(),
-    summary: z.string(),
-    process: z.string(),
-    evidenceIds: z.array(z.string()),
-    stepCount: z.number().int().positive(),
-  })),
+  procedures: z.array(procedureSchema),
+  troubleshootingPaths: z.array(troubleshootingPathSchema),
 });
 
 export type AppSession = z.infer<typeof sessionResponseSchema>;

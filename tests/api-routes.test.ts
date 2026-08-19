@@ -55,7 +55,8 @@ describe("public product routes", () => {
       packageVersion: string;
       evidence: Array<{ id: string }>;
       entities: Array<{ id: string }>;
-      procedures: Array<{ id: string; stepCount: number; steps?: unknown }>;
+      procedures: Array<{ id: string; steps: unknown[] }>;
+      troubleshootingPaths: Array<{ id: string }>;
     };
 
     expect(response.status).toBe(200);
@@ -64,11 +65,8 @@ describe("public product routes", () => {
     expect(payload.packageVersion).toBe(productPackage.packageVersion);
     expect(payload.evidence).toHaveLength(productPackage.evidence.length);
     expect(payload.entities).toHaveLength(productPackage.entities.length);
-    expect(payload.procedures).toEqual(productPackage.procedures.map((procedure) => expect.objectContaining({
-      id: procedure.id,
-      stepCount: procedure.steps.length,
-    })));
-    expect(payload.procedures.every((procedure) => procedure.steps === undefined)).toBe(true);
+    expect(payload.procedures).toEqual(productPackage.procedures);
+    expect(payload.troubleshootingPaths).toEqual(productPackage.troubleshootingPaths);
   });
 
   it("returns 404 for an unknown product", async () => {
@@ -121,6 +119,8 @@ describe("public product routes", () => {
       entity: { id: string; evidenceIds: string[] };
       facts: Array<{ entityIds: string[] }>;
       evidence: Array<{ id: string }>;
+      relatedProcedures: Array<{ id: string }>;
+      warnings: string[];
     };
 
     expect(response.status).toBe(200);
@@ -129,6 +129,8 @@ describe("public product routes", () => {
     expect(payload.facts).toEqual(expectedFacts);
     expect(payload.facts.length).toBeGreaterThan(0);
     expect(payload.evidence.map(({ id }) => id)).toEqual(expected.evidenceIds);
+    expect(Array.isArray(payload.relatedProcedures)).toBe(true);
+    expect(Array.isArray(payload.warnings)).toBe(true);
   });
 
   it("returns 404 for an unknown entity", async () => {

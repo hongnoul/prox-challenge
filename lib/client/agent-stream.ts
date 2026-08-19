@@ -75,6 +75,28 @@ export async function streamAgentTurn({
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let streamSessionId: string | null = null;
+  let streamTurnId: string | null = null;
+  let lastSequence = 0;
+  let terminalReceived = false;
+
+  const acceptEvent = (event: AgentEvent) => {
+    if (event.sequence <= lastSequence) return;
+    if (terminalReceived) {
+      throw new AgentStreamError("The agent streamed data after a terminal event.", "event_after_terminal");
+    }
+    if (event.sequence !== lastSequence + 1) {
+      throw new AgentStreamError("The agent stream skipped an event sequence.", "sequence_gap");
+    }
+    streamSessionId ??= event.sessionId;
+    streamTurnId ??= event.turnId;
+    if (event.sessionId !== streamSessionId || event.turnId !== streamTurnId) {
+      throw new AgentStreamError("The agent mixed multiple turns in one stream.", "mixed_turn");
+    }
+    lastSequence = event.sequence;
+    terminalReceived = event.type === "complete" || event.type === "error";
+    onEvent(event);
+  };
 
   while (true) {
     const { value, done } = await reader.read();
@@ -84,7 +106,7 @@ export async function streamAgentTurn({
     buffer = blocks.pop() ?? "";
     for (const block of blocks) {
       const event = parseEventBlock(block);
-      if (event) onEvent(event);
+      if (event) acceptEvent(event);
     }
 
     if (done) break;
@@ -92,8 +114,12 @@ export async function streamAgentTurn({
 
   if (buffer.trim()) {
     const event = parseEventBlock(buffer);
-    if (event) onEvent(event);
+    if (event) acceptEvent(event);
   }
 
-  return { sessionId: response.headers.get("X-OmniPro-Session") };
+  if (!terminalReceived) {
+    throw new AgentStreamError("The agent stream ended without a completion event.", "missing_terminal");
+  }
+
+  return { sessionId: response.headers.get("X-OmniPro-Session") ?? streamSessionId };
 }

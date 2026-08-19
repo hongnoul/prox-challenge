@@ -92,7 +92,7 @@ export function answerDeterministically(
       evidenceIds: procedure.evidenceIds,
       factIds: ["fact-tig-connections", "fact-tig-argon", "fact-tig-foot-pedal-optional"],
       procedureId: procedure.id,
-      sceneCommands: procedure.steps.flatMap(({ sceneCommands }) => sceneCommands),
+      sceneCommands: procedure.steps[0]?.sceneCommands ?? [],
       artifact: { artifactType: "polarity", props: { process: "tig", torch: "negative", ground: "positive" } },
     };
   }
@@ -105,7 +105,7 @@ export function answerDeterministically(
       evidenceIds: procedure.evidenceIds,
       factIds: ["fact-flux-dcen"],
       procedureId: procedure.id,
-      sceneCommands: procedure.steps.flatMap(({ sceneCommands }) => sceneCommands),
+      sceneCommands: procedure.steps[0]?.sceneCommands ?? [],
       artifact: { artifactType: "polarity", props: { process: "flux-core", wire: "negative", ground: "positive" } },
     };
   }
@@ -118,7 +118,7 @@ export function answerDeterministically(
       evidenceIds: procedure.evidenceIds,
       factIds: ["fact-mig-dcep"],
       procedureId: procedure.id,
-      sceneCommands: procedure.steps.flatMap(({ sceneCommands }) => sceneCommands),
+      sceneCommands: procedure.steps[0]?.sceneCommands ?? [],
       artifact: { artifactType: "polarity", props: { process: "mig", wire: "positive", ground: "negative" } },
     };
   }
@@ -152,4 +152,3 @@ export function answerDeterministically(
     sceneCommands: [],
   };
 }
-

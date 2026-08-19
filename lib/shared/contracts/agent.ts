@@ -44,13 +44,17 @@ export const agentEventSchema = z.object({
   payload: z.unknown(),
 }).superRefine((event, context) => {
   const payloadSchemas: Partial<Record<z.infer<typeof agentEventTypeSchema>, z.ZodType>> = {
+    "turn-start": z.object({ mode: z.enum(["live", "deterministic"]), concurrency: z.number().int().positive() }),
     "text-delta": z.object({ text: z.string() }),
     "clarification-request": z.object({ question: z.string(), fields: z.array(z.string()) }),
+    "tool-start": z.object({ toolName: z.string().min(1), toolUseId: z.string().min(1) }),
+    "tool-result": z.object({ toolName: z.string().min(1), toolUseId: z.string().min(1), result: z.unknown() }),
     citation: citationPayloadSchema,
     "scene-command": z.object({ commands: z.array(sceneCommandSchema) }),
     "artifact-request": artifactRequestSchema,
+    "procedure-progress": z.object({ procedureId: z.string().min(1), stepIndex: z.number().int().nonnegative() }),
     warning: z.object({ message: z.string() }),
-    complete: z.object({ stopReason: z.string().optional() }),
+    complete: z.object({ stopReason: z.string().optional(), costUsd: z.number().nonnegative().optional() }),
     error: z.object({ message: z.string(), code: z.string() }),
   };
   const schema = payloadSchemas[event.type];
