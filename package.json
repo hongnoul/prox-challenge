@@ -14,11 +14,13 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "validate": "npm run product:check && npm run check:model && npm run typecheck && npm test && npm run build",
-    "check:model": "tsx scripts/check-omnipro-model.ts"
+    "check:model": "tsx scripts/check-omnipro-model.ts",
+    "db:rate-limit:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/migrate-rate-limit.ts",
+    "db:rate-limit:check": "node --env-file-if-exists=.env.local --import tsx scripts/check-rate-limit-db.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "0.3.235",
-    "@upstash/redis": "^1.38.2",
+    "@neondatabase/serverless": "^1.1.0",
     "gsap": "3.15.0",
     "next": "16.3.1",
     "react": "19.2.8",

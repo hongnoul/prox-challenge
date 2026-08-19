@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   consumeRateLimit,
-  consumeSharedRateLimit,
+  consumePostgresRateLimit,
   FixedWindowRateLimiter,
   positiveInteger,
   rateLimitHeaders,
@@ -40,7 +40,7 @@ describe("fixed-window rate limiter", () => {
     expect(positiveInteger("not-a-number", 5)).toBe(5);
   });
 
-  it("uses the in-process limiter only outside production when Redis is absent", async () => {
+  it("uses the in-process limiter only outside production when Postgres is absent", async () => {
     const first = await consumeRateLimit("local-test", 1, 1_000, 5_000);
     const denied = await consumeRateLimit("local-test", 1, 1_000, 5_100);
 
@@ -48,26 +48,37 @@ describe("fixed-window rate limiter", () => {
     expect(denied).toMatchObject({ allowed: false, remaining: 0 });
   });
 
-  it("maps the atomic Redis script result to quota metadata", async () => {
-    const evalMock = vi.fn().mockResolvedValue([2, 750]);
-    const result = await consumeSharedRateLimit(
-      { eval: evalMock },
+  it("maps the atomic Postgres result to quota metadata", async () => {
+    const queryMock = vi.fn().mockResolvedValue([{ count: "2", reset_at_ms: "5750" }]);
+    const result = await consumePostgresRateLimit(
+      { query: queryMock },
       "agent:session:test",
       3,
       1_000,
-      5_000,
     );
 
     expect(result).toEqual({ allowed: true, limit: 3, remaining: 1, resetAt: 5_750 });
-    expect(evalMock).toHaveBeenCalledWith(
-      expect.stringContaining("INCR"),
-      ["omnipro:rate-limit:agent:session:test"],
-      ["1000"],
+    expect(queryMock).toHaveBeenCalledWith(
+      expect.stringContaining("ON CONFLICT (key) DO UPDATE"),
+      ["omnipro:rate-limit:agent:session:test", 1_000],
     );
   });
 
+  it("rejects malformed shared-store counters", async () => {
+    await expect(consumePostgresRateLimit(
+      { query: vi.fn().mockResolvedValue([{ count: "invalid", reset_at_ms: "5750" }]) },
+      "agent:session:test",
+      3,
+      1_000,
+    )).rejects.toBeInstanceOf(SharedRateLimitUnavailableError);
+  });
+
   it("fails closed in production when shared storage is not configured", async () => {
-    vi.stubEnv("RATE_LIMIT_REQUIRE_SHARED", "true");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("VERCEL_ENV", "");
+    vi.stubEnv("RATE_LIMIT_DATABASE_URL", "");
+    vi.stubEnv("DATABASE_URL", "");
+    vi.stubEnv("POSTGRES_URL", "");
 
     await expect(consumeRateLimit("production-test", 1, 1_000)).rejects.toBeInstanceOf(
       SharedRateLimitUnavailableError,

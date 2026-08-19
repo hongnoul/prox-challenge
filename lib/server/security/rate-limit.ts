@@ -1,4 +1,4 @@
-import { Redis } from "@upstash/redis";
+import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 
 export type RateLimitResult = {
   allowed: boolean;
@@ -12,21 +12,42 @@ type Bucket = {
   resetAt: number;
 };
 
-type RateLimitStore = {
-  eval(script: string, keys: string[], args: string[]): Promise<unknown>;
+type RateLimitRow = {
+  count: unknown;
+  reset_at_ms: unknown;
 };
 
-const FIXED_WINDOW_SCRIPT = `
-local count = redis.call("INCR", KEYS[1])
-if count == 1 then
-  redis.call("PEXPIRE", KEYS[1], ARGV[1])
-end
-local ttl = redis.call("PTTL", KEYS[1])
-if ttl < 0 then
-  redis.call("PEXPIRE", KEYS[1], ARGV[1])
-  ttl = tonumber(ARGV[1])
-end
-return { count, ttl }
+type RateLimitDatabase = {
+  query(query: string, params?: unknown[]): Promise<Record<string, unknown>[]>;
+};
+
+const CONSUME_RATE_LIMIT_SQL = `
+WITH params AS (
+  SELECT clock_timestamp() AS now, $2::bigint AS window_ms
+), pruned AS (
+  DELETE FROM omnipro_rate_limits
+  WHERE key <> $1::text
+    AND reset_at < (SELECT now FROM params) - INTERVAL '1 day'
+), consumed AS (
+  INSERT INTO omnipro_rate_limits (key, count, reset_at)
+  SELECT $1::text, 1, now + window_ms * INTERVAL '1 millisecond'
+  FROM params
+  ON CONFLICT (key) DO UPDATE SET
+    count = CASE
+      WHEN omnipro_rate_limits.reset_at <= (SELECT now FROM params) THEN 1
+      ELSE omnipro_rate_limits.count + 1
+    END,
+    reset_at = CASE
+      WHEN omnipro_rate_limits.reset_at <= (SELECT now FROM params)
+        THEN (SELECT now + window_ms * INTERVAL '1 millisecond' FROM params)
+      ELSE omnipro_rate_limits.reset_at
+    END
+  RETURNING count, reset_at
+)
+SELECT
+  count,
+  FLOOR(EXTRACT(EPOCH FROM reset_at) * 1000)::bigint AS reset_at_ms
+FROM consumed
 `;
 
 export class SharedRateLimitUnavailableError extends Error {
@@ -80,68 +101,79 @@ declare global {
   // eslint-disable-next-line no-var
   var __omniproRateLimiter: FixedWindowRateLimiter | undefined;
   // eslint-disable-next-line no-var
-  var __omniproRateLimitRedis: { fingerprint: string; client: Redis } | undefined;
+  var __omniproRateLimitDatabase: {
+    fingerprint: string;
+    client: NeonQueryFunction<false, false>;
+  } | undefined;
 }
 
 export const rateLimiter = globalThis.__omniproRateLimiter ??= new FixedWindowRateLimiter();
 
-function redisClient(): Redis | null {
-  const url = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-
-  const fingerprint = `${url}\u0000${token}`;
-  if (globalThis.__omniproRateLimitRedis?.fingerprint === fingerprint) {
-    return globalThis.__omniproRateLimitRedis.client;
-  }
-
-  const client = new Redis({ url, token });
-  globalThis.__omniproRateLimitRedis = { fingerprint, client };
-  return client;
+function rateLimitDatabaseUrl(): string | null {
+  const explicit = process.env.RATE_LIMIT_DATABASE_URL;
+  if (explicit) return explicit;
+  const productionRuntime = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
+  return productionRuntime ? process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? null : null;
 }
 
 function sharedLimiterRequired(): boolean {
-  return process.env.RATE_LIMIT_REQUIRE_SHARED === "true" || process.env.VERCEL_ENV === "production";
+  return process.env.RATE_LIMIT_REQUIRE_SHARED === "true"
+    || process.env.NODE_ENV === "production"
+    || process.env.VERCEL_ENV === "production";
 }
 
-function parseSharedResult(value: unknown): [count: number, ttlMs: number] {
-  if (!Array.isArray(value) || value.length !== 2) {
+function rateLimitDatabase(): RateLimitDatabase | null {
+  const url = rateLimitDatabaseUrl();
+  if (!url) return null;
+
+  const cached = globalThis.__omniproRateLimitDatabase;
+  if (cached?.fingerprint === url) return cached.client;
+
+  try {
+    const client = neon(url);
+    globalThis.__omniproRateLimitDatabase = { fingerprint: url, client };
+    return client;
+  } catch (error) {
+    throw new SharedRateLimitUnavailableError(
+      error instanceof Error ? `Shared limiter configuration failed: ${error.message}` : undefined,
+    );
+  }
+}
+
+function parseSharedResult(value: unknown): [count: number, resetAt: number] {
+  if (!Array.isArray(value) || value.length !== 1) {
     throw new SharedRateLimitUnavailableError("Shared limiter returned an invalid result");
   }
-  const count = Number(value[0]);
-  const ttlMs = Number(value[1]);
-  if (!Number.isSafeInteger(count) || count < 1 || !Number.isFinite(ttlMs) || ttlMs <= 0) {
+  const row = value[0] as Partial<RateLimitRow> | null;
+  const count = Number(row?.count);
+  const resetAt = Number(row?.reset_at_ms);
+  if (!Number.isSafeInteger(count) || count < 1 || !Number.isSafeInteger(resetAt) || resetAt <= 0) {
     throw new SharedRateLimitUnavailableError("Shared limiter returned invalid counters");
   }
-  return [count, ttlMs];
+  return [count, resetAt];
 }
 
-export async function consumeSharedRateLimit(
-  store: RateLimitStore,
+export async function consumePostgresRateLimit(
+  store: RateLimitDatabase,
   key: string,
   limit: number,
   windowMs: number,
-  now = Date.now(),
 ): Promise<RateLimitResult> {
   let raw: unknown;
   try {
-    raw = await store.eval(
-      FIXED_WINDOW_SCRIPT,
-      [`omnipro:rate-limit:${key}`],
-      [String(windowMs)],
-    );
+    raw = await store.query(CONSUME_RATE_LIMIT_SQL, [`omnipro:rate-limit:${key}`, windowMs]);
   } catch (error) {
     throw new SharedRateLimitUnavailableError(
       error instanceof Error ? `Shared limiter failed: ${error.message}` : undefined,
     );
   }
 
-  const [count, ttlMs] = parseSharedResult(raw);
+  const [count, resetAt] = parseSharedResult(raw);
   return {
     allowed: count <= limit,
     limit,
     remaining: Math.max(0, limit - count),
-    resetAt: now + ttlMs,
+    resetAt,
   };
 }
 
@@ -151,8 +183,8 @@ export async function consumeRateLimit(
   windowMs: number,
   now = Date.now(),
 ): Promise<RateLimitResult> {
-  const client = redisClient();
-  if (client) return consumeSharedRateLimit(client, key, limit, windowMs, now);
+  const client = rateLimitDatabase();
+  if (client) return consumePostgresRateLimit(client, key, limit, windowMs);
   if (sharedLimiterRequired()) throw new SharedRateLimitUnavailableError();
   return rateLimiter.consume(key, limit, windowMs, now);
 }
