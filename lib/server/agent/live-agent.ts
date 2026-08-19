@@ -1,6 +1,7 @@
 import { query, type SDKMessage } from "@anthropic-ai/claude-agent-sdk";
 import type { AgentEvent, AgentEventType, AgentRequest } from "@/lib/shared/contracts";
 import { agentEventSchema } from "@/lib/shared/contracts";
+import { normalizeArtifactRequest } from "./artifacts";
 import { createProductTools, productToolNames, validateSceneCommands } from "./tools";
 
 const SYSTEM_PROMPT = `You are the OmniPro 220 Product Copilot for a capable owner working in a garage or small shop.
@@ -59,10 +60,7 @@ export async function runLiveAgentTurn(options: {
       effort: "medium",
       systemPrompt: SYSTEM_PROMPT,
       env: {
-        PATH: process.env.PATH,
-        HOME: process.env.HOME,
-        ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
-        ANTHROPIC_BASE_URL: process.env.ANTHROPIC_BASE_URL,
+        ...process.env,
         CLAUDE_AGENT_SDK_CLIENT_APP: "omnipro-product-twin/0.1.0",
       },
     },
@@ -97,7 +95,9 @@ export async function runLiveAgentTurn(options: {
         else write(nextEvent("warning", { message: "The agent requested an unknown product scene entity. The command was ignored." }));
       }
       if (block.name === "mcp__omnipro__open_artifact") {
-        write(nextEvent("artifact-request", input));
+        const artifact = normalizeArtifactRequest(input);
+        if (artifact) write(nextEvent("artifact-request", artifact));
+        else write(nextEvent("warning", { message: "The agent requested an incomplete artifact. The request was ignored." }));
       }
     }
 

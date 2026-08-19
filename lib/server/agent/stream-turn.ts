@@ -1,4 +1,5 @@
 import type { AgentEvent, AgentEventType, AgentRequest } from "@/lib/shared/contracts";
+import { getAgentRuntimeStatus } from "./auth";
 import { answerDeterministically } from "./deterministic-agent";
 import { runLiveAgentTurn, validateEvent } from "./live-agent";
 import { Semaphore } from "./semaphore";
@@ -50,14 +51,15 @@ export function createAgentEventStream(request: AgentRequest, requestSignal: Abo
         let release: (() => void) | undefined;
         try {
           release = await turnSemaphore.acquire(timeoutController.signal);
+          const runtimeStatus = getAgentRuntimeStatus();
           write(nextEvent("turn-start", {
-            mode: process.env.ANTHROPIC_API_KEY && process.env.OMNIPRO_AGENT_MODE !== "deterministic" ? "live" : "deterministic",
+            mode: runtimeStatus.mode,
             concurrency: turnSemaphore.activeCount,
           }));
 
-          if (!process.env.ANTHROPIC_API_KEY || process.env.OMNIPRO_AGENT_MODE === "deterministic") {
-            if (!process.env.ANTHROPIC_API_KEY) {
-              write(nextEvent("warning", { message: "ANTHROPIC_API_KEY is not configured. Using the deterministic evidence engine." }));
+          if (runtimeStatus.mode === "deterministic") {
+            if (runtimeStatus.credentialSource === "none" && process.env.OMNIPRO_AGENT_MODE !== "deterministic") {
+              write(nextEvent("warning", { message: "No Claude Agent SDK credential was detected. Using the deterministic evidence engine." }));
             }
             const response = answerDeterministically(turnRequest.message, turnRequest.twinState);
             if (response.clarification) write(nextEvent("clarification-request", response.clarification));
