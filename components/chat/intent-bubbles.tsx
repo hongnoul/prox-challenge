@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 
-type IntentId = "explore" | "guide" | "diagnose";
+export type IntentId = "explore" | "guide" | "diagnose";
 
 type IntentOption = {
   id: IntentId;
@@ -11,7 +11,7 @@ type IntentOption = {
   response: string;
 };
 
-const intentOptions: IntentOption[] = [
+export const intentOptions: IntentOption[] = [
   {
     id: "explore",
     label: "Explore the machine",
@@ -29,7 +29,11 @@ const intentOptions: IntentOption[] = [
   },
 ];
 
-export function IntentBubbles() {
+type IntentBubblesProps = {
+  onSelectIntent?: (intent: IntentId) => void;
+};
+
+export function IntentBubbles({ onSelectIntent }: IntentBubblesProps = {}) {
   const [selectedIntent, setSelectedIntent] = useState<IntentId | null>(null);
   const pillRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const labelRefs = useRef<Array<HTMLSpanElement | null>>([]);
@@ -76,7 +80,16 @@ export function IntentBubbles() {
       });
     });
 
-    return () => context.revert();
+    // Background tabs and headless assistive browsers may throttle GSAP's
+    // animation frame. Never let an entrance animation hide real controls.
+    const revealFallback = window.setTimeout(() => {
+      gsap.set([...pills, ...labels], { autoAlpha: 1, scale: 1, y: 0 });
+    }, 1_500);
+
+    return () => {
+      window.clearTimeout(revealFallback);
+      context.revert();
+    };
   }, []);
 
   useEffect(() => {
@@ -113,7 +126,10 @@ export function IntentBubbles() {
               className="intent-pill"
               aria-pressed={isSelected}
               data-selected={isSelected || undefined}
-              onClick={() => setSelectedIntent(intent.id)}
+              onClick={() => {
+                setSelectedIntent(intent.id);
+                onSelectIntent?.(intent.id);
+              }}
               style={{ opacity: 0 }}
             >
               <span

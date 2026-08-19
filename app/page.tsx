@@ -1,9 +1,5 @@
-import { IntentBubbles } from "@/components/chat/intent-bubbles";
+import { WorkspaceApp } from "@/components/workspace/workspace-app";
 
 export default function HomePage() {
-  return (
-    <main className="onboarding-shell">
-      <IntentBubbles />
-    </main>
-  );
+  return <WorkspaceApp />;
 }
