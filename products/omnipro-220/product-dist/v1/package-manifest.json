@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "1.0.0",
+  "packageSha256": "8e08cd2cce1f50d011b97eb42fbbe96d50794fd27242fae409597339873b83af",
+  "sourceHashes": {
+    "owner-manual": "52aa60b4e51e9671b85c1077c23c42fc5db852ec9626e1a3bf55f0d664964789",
+    "quick-start-guide": "4a44c4b18988c05b9dabaa953392f9ecd598dcc689d4a75ec2f54f06a6fa400e",
+    "selection-chart": "670497435b031e4b6c48e5cec5322979fe8ab80d4f8380406cc492fee5f710f4",
+    "product-front-photo": "c80366105834175156dfbc5d425fba6e4f3cc448910f958a03c372f74485d752",
+    "product-inside-photo": "1513e0ae01be1f565835c90633b6ec79225c3f89197785b1eeda5aa91b233325"
+  },
+  "assetHashes": {
+    "ev-front-controls-p8": "cdfca4920150699e2a1543066e5f21fed501c5d00ce243c04ea58a86320adc46",
+    "ev-flux-dcen-p13": "14853fe8a37d7c098c3a6dfae7bd69b810222a480b9adc94c57519033c8121fa",
+    "ev-mig-dcep-p14": "84e29fe713d5b504e47804aff885ab4203abffb2519aea8c565e520118ac559c",
+    "ev-duty-cycle-p19": "60dbe663cd2ed77f02972a012dcbee7f609f819bc9fd9952b5a75f508c9ecb52",
+    "ev-tig-connections-p24": "9ad2a6d7baf0be910a106e42bd64b7a30eef74153f08182d3121c4a0cca35d4d",
+    "ev-tig-argon-p25": "76103dda79087bb94dc3d1332ddb403dfc435448d8b80a7ba1588577c2be1602",
+    "ev-wire-porosity-p37": "94fef234aef8f68c4a37cda8e565062dad64d87d274b650b16d9fe0a11b99775",
+    "ev-selection-chart": "d42eebe7b0ee01de50c14cd7e1c3124569730fc869780c0d112efccf11e80245",
+    "ev-product-front": "c80366105834175156dfbc5d425fba6e4f3cc448910f958a03c372f74485d752",
+    "ev-product-inside": "1513e0ae01be1f565835c90633b6ec79225c3f89197785b1eeda5aa91b233325"
+  }
+}
